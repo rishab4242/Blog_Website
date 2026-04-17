@@ -9,73 +9,185 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
+import { Link, Links } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import StarIcon from "@mui/icons-material/Star";
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
 const BlogCard = ({ blog, addToCart }) => {
+  // console.log(blog);
+
   return (
     <Card
       sx={{
-        maxWidth: 320,
+        width: 320,
         m: 2,
         borderRadius: 3,
-        boxShadow: 4,
+        boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
         transition: "0.3s",
+        overflow: "hidden",
         "&:hover": {
           transform: "scale(1.03)",
           boxShadow: 8,
         },
+        bgcolor: "#fff",
       }}
     >
-      {/* Image */}
-      <CardMedia
-        component="img"
-        height="200"
-        image={`http://localhost:8080/uploads/${blog.image}`}
-        alt={blog.title}
-      />
+      <Link to={`/blogs/${blog.id}/view`}>
+        <CardMedia
+          component="img"
+          height="200"
+          image={`http://localhost:8080/uploads/${blog.image}`}
+          alt={blog.title}
+          sx={{ objectFit: "cover", padding: "15px" }}
+        />
+      </Link>
 
       {/* Content */}
-      <CardContent>
-        <Typography gutterBottom variant="h6" fontWeight="bold">
-          {blog.title}
-        </Typography>
-
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ height: 40, overflow: "hidden" }}
+      <CardContent sx={{ pb: 0, pt: 1.5, px: 2 }}>
+        {/* Title + Rating Row */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
         >
-          {blog.content}
-        </Typography>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            sx={{ fontSize: "1.1rem" }}
+          >
+            {blog.title}
+          </Typography>
 
-        {/* Rating */}
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
-          <Rating value={blog.rating || 4} precision={0.5} readOnly />
-          <Typography variant="caption">(120)</Typography>
+          {blog.rating ? (
+            <Chip
+              icon={
+                <StarIcon
+                  sx={{ fontSize: "0.95rem", color: "#fff !important" }}
+                />
+              }
+              label={blog.rating}
+              size="small"
+              sx={{
+                bgcolor: "#4caf50",
+                color: "#fff",
+                fontWeight: "bold",
+                fontSize: "0.82rem",
+                height: 26,
+                borderRadius: "6px",
+                "& .MuiChip-icon": { color: "#fff" },
+              }}
+            />
+          ) : null}
         </Stack>
 
-        {/* Price */}
-        <Typography
-          variant="h6"
-          color="primary"
-          sx={{ mt: 1, fontWeight: "bold" }}
+        {/* Cuisine tags + Price Row */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ mt: 0.5 }}
         >
-          ₹ {blog.price}
-        </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontSize: "0.8rem" }}
+          >
+            {blog.content}
+          </Typography>
+          <Typography
+            variant="body1"
+            fontWeight="bold"
+            sx={{
+              color: "#222",
+              fontSize: "0.95rem",
+              whiteSpace: "nowrap",
+              ml: 1,
+            }}
+          >
+            ₹ {blog.price}
+          </Typography>
+        </Stack>
       </CardContent>
 
       {/* Actions */}
-      <CardActions sx={{ justifyContent: "space-between", px: 2, pb: 2 }}>
+      <CardActions
+        sx={{
+          px: 1,
+          pb: 2,
+          pt: 1.5,
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        {/* Left: trending icon */}
+        <IconButton
+          size="small"
+          sx={{
+            color: "#7c6af7",
+            bgcolor: "#ede9fe",
+            borderRadius: "50%",
+            p: 0.8,
+          }}
+        >
+          <TrendingUpIcon fontSize="small" />
+        </IconButton>
+
+        {/* Center: Add to Cart button */}
         <Button
           variant="contained"
-          startIcon={<ShoppingCartIcon />}
           onClick={() => addToCart(blog)}
+          sx={{
+            width: "130px",
+            mx: 1.5,
+            borderRadius: "24px",
+            bgcolor: "#ff6b6b",
+            color: "#fff",
+            fontWeight: "bold",
+            fontSize: "0.95rem",
+            textTransform: "none",
+            boxShadow: "none",
+            py: 0.9,
+            "&:hover": { bgcolor: "#e55a5a", boxShadow: "none" },
+          }}
         >
-          Add to Cart
+          Add TO Cart
         </Button>
 
-        <IconButton color="error">
-          <FavoriteBorderIcon />
-        </IconButton>
+        {/* Right: Max Safety Delivery badge */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            bgcolor: "#f5f5f5",
+            borderRadius: "8px",
+            px: 0.8,
+            py: 0.4,
+            border: "1px solid #e0e0e0",
+            minWidth: 54,
+          }}
+        >
+          <LocalShippingOutlinedIcon
+            sx={{ fontSize: "1rem", color: "#4caf50" }}
+          />
+          <Typography
+            sx={{
+              fontSize: "0.45rem",
+              color: "#4caf50",
+              fontWeight: "bold",
+              lineHeight: 1.2,
+              textAlign: "center",
+              textTransform: "uppercase",
+            }}
+          >
+            Max Safety
+            <br />
+            Delivery
+          </Typography>
+        </Box>
       </CardActions>
     </Card>
   );

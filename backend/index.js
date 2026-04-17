@@ -27,11 +27,15 @@ const connection = mysql.createConnection({
   password: "root",
 });
 
-app.get("/blogs", authMiddleware, (req, res) => {
-  const userId = req.user.id;
-  let q = `SELECT * FROM blogs WHERE user_id = ?`;
+app.get("/blogs", (req, res) => {
+  let q = `
+    SELECT b.*, r.rating 
+    FROM blogs b
+    LEFT JOIN ratings r 
+    ON r.id = b.rating_id
+  `;
   try {
-    connection.query(q, [userId], (err, result) => {
+    connection.query(q, (err, result) => {
       if (err) throw err;
       let blog = result;
       res.send(blog);
@@ -42,21 +46,27 @@ app.get("/blogs", authMiddleware, (req, res) => {
 });
 
 app.get("/blogs/:id/view", authMiddleware, (req, res) => {
-  let { id } = req.params;
-  let q1 = `SELECT * FROM blogs WHERE id=${id}`;
+  const currentUserId = req.user.id;
 
-  try {
-    connection.query(q1, (err, result) => {
-      if (err) throw err;
-      res.send(result);
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "No Data Found" });
-  }
+  const { id } = req.params;
+
+  let q = `SELECT * FROM blogs WHERE id = ?`;
+
+  connection.query(q, [id], (err, result) => {
+    if (err) throw err;
+
+    if (result.length === 0) {
+      return res.status(404).send("Blog not found");
+    }
+
+    let blog = result[0]; // 👈 important
+
+    blog.isOwner = Number(blog.user_id) === Number(req.user.id);
+    res.send(blog);
+  });
 });
 
-app.get("/blogs/search", authMiddleware, (req, res) => {
+app.get("/blogs/search", (req, res) => {
   let { title } = req.query;
 
   let q1 = `SELECT * FROM blogs WHERE title LIKE ? LIMIT 1`;
@@ -230,15 +240,20 @@ app.get("/blogs/:id/rating", (req, res) => {
   }
 });
 
-app.delete("/blogs/:id/rating/delete", (req, res) => {
+app.delete("/blogs/:id/rating/delete", authMiddleware, (req, res) => {
+  const currentUserId = req.user.id;
   let { id } = req.params;
 
-  let q1 = `DELETE FROM ratings WHERE id='${id}'`;
+  let q = `DELETE FROM blogs WHERE id = ? AND user_id = ?`;
 
   try {
-    connection.query(q1, (err, result) => {
+    connection.query(q, [id, currentUserId], (err, result) => {
       if (err) throw err;
       res.status(200).json({ message: "Rating Deleted Successfully!" });
+
+      let blog = result;
+
+      blog.isOwner = blog.user_id === currentUserId;
     });
   } catch (error) {
     console.log(error);
@@ -316,8 +331,8 @@ app.post("/order", async (req, res) => {
       key_secret: process.env.RAZORPAY_SECRET,
     });
 
-    const cartItems = req.body;
-    const order = await razorpay.orders.create(cartItems);
+    const options = req.body;
+    const order = await razorpay.orders.create(options);
 
     if (!order) {
       return res.status(500).json({ message: "Error" });
@@ -335,9 +350,9 @@ app.post("/order/validate", async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
     req.body;
 
-  const sha = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET);
-  sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
-  const digest = sha.digest("hex");
+  const sha = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET); // i am define the HMAC generator  macine setup using sha256 algorithm with my s_key
+  sha.update(`${razorpay_order_id}|${razorpay_payment_id}`); // passing data to Hasing machine
+  const digest = sha.digest("hex"); // this code give it final output means youre hansing string will be here
 
   if (digest !== razorpay_signature) {
     return res.status(400).json({ message: "Transaction is not legit!" });

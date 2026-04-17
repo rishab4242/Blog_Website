@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
 import axios from "axios";
 import BlogCard from "../components/BlogCard";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function AllBlogs({ setCartItems }) {
   let [blogs, setBlogs] = useState([]);
+
+  const navigate = useNavigate();
 
   const addToCart = (blog) => {
     setCartItems((prev) => [...prev, blog]);
@@ -21,7 +22,9 @@ function AllBlogs({ setCartItems }) {
           },
         });
         setBlogs(res.data);
-        // console.log(res.data);
+        if (!token) {
+          navigate("/blogs/login");
+        }
       } catch (error) {
         console.log(error);
       }
@@ -37,8 +40,6 @@ function AllBlogs({ setCartItems }) {
         {blogs.map((blog) => (
           <div key={blog.id}>
             <BlogCard blog={blog} addToCart={addToCart} />
-
-            <Link to={`/blogs/${blog.id}/view`}>View Blog</Link>
           </div>
         ))}
       </div>

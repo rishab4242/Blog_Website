@@ -4,50 +4,52 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import Ratings from "../components/Ratings";
-import { Box, Rating, Stack, Paper, Divider } from "@mui/material";
+import { Box, Rating, Stack, Paper } from "@mui/material";
 
 function ViewBlogs() {
-  let [viewblog, setViewblog] = useState([]);
+  let [viewblog, setViewblog] = useState(null);
   let [ratings, setRatings] = useState([]);
 
   const { id } = useParams();
   const navigate = useNavigate();
 
+  // FETCH BLOG
   useEffect(() => {
     const fetchViewBlog = async () => {
       const token = localStorage.getItem("token");
+
       try {
         let res = await axios.get(`http://localhost:8080/blogs/${id}/view`, {
-          headers: {
-            Authorization: token,
-          },
+          headers: { Authorization: token },
         });
-        // console.log(res.data);
+
         setViewblog(res.data);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchViewBlog();
-  }, []);
 
+    fetchViewBlog();
+  }, [id]);
+
+  // FETCH RATINGS
   useEffect(() => {
     const fetchViewBlogRatings = async () => {
       try {
         let res = await axios.get(`http://localhost:8080/blogs/${id}/rating`);
-        // console.log(res.data);
+
         setRatings(res.data);
       } catch (error) {
         console.log(error);
       }
     };
+
     fetchViewBlogRatings();
-  }, []);
+  }, [id]);
 
   const navigateToeditpage = (id) => {
     navigate(`/blogs/${id}`);
@@ -61,13 +63,12 @@ function ViewBlogs() {
     );
 
     if (!confirmAction) return;
+
     try {
       let res = await axios.delete(`http://localhost:8080/blogs/${id}/delete`, {
-        headers: {
-          Authorization: token,
-        },
+        headers: { Authorization: token },
       });
-      setViewblog((prevBlogs) => prevBlogs.filter((blog) => blog.id !== id));
+
       alert(res.data.message);
       navigate("/blogs");
     } catch (error) {
@@ -81,70 +82,71 @@ function ViewBlogs() {
     );
 
     if (!confirmAction) return;
+
     try {
       let res = await axios.delete(
         `http://localhost:8080/blogs/${id}/rating/delete`,
       );
-      setRatings((prevRatings) =>
-        prevRatings.filter((rating) => rating.id !== id),
-      );
+
+      setRatings((prev) => prev.filter((rating) => rating.id !== id));
+
       alert(res.data.message);
     } catch (error) {
       console.log(error);
-      alert(res.data.error.message);
     }
   };
 
   return (
-    <div
-      style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}
-    >
-      {viewblog.map((blog) => (
-        <Card
-          key={blog.id}
-          sx={{ maxWidth: 345, m: 2, borderRadius: 3, boxShadow: 3 }}
-        >
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      {viewblog && (
+        <Card sx={{ maxWidth: 345, m: 2, borderRadius: 3, boxShadow: 3 }}>
           <CardMedia
             component="img"
+            sx={{ padding: "10px" }}
             height="200"
-            image={`http://localhost:8080/uploads/${blog.image}`}
-            alt={blog.title}
+            image={`http://localhost:8080/uploads/${viewblog.image}`}
+            alt={viewblog.title}
           />
 
           <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-              {blog.title}
+            <Typography gutterBottom variant="h5">
+              {viewblog.title}
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
-              {blog.content}
+              {viewblog.content}
             </Typography>
 
             <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: "bold" }}>
-              ₹ {blog.price}
+              ₹ {viewblog.price}
             </Typography>
           </CardContent>
 
-          <CardActions>
-            <Button
-              size="small"
-              variant="contained"
-              color="success"
-              onClick={() => navigateToeditpage(blog.id)}
-            >
-              Edit
-            </Button>
-            <Button
-              size="small"
-              variant="contained"
-              color="error"
-              onClick={() => handleDelete(blog.id)}
-            >
-              Delete
-            </Button>
-          </CardActions>
+          {/* OWNER BUTTONS */}
+          {viewblog.isOwner && (
+            <CardActions>
+              <Button
+                size="small"
+                variant="contained"
+                color="success"
+                onClick={() => navigateToeditpage(viewblog.id)}
+              >
+                Edit
+              </Button>
 
-          <Ratings blogId={blog.id} />
+              <Button
+                size="small"
+                variant="contained"
+                color="error"
+                onClick={() => handleDelete(viewblog.id)}
+              >
+                Delete
+              </Button>
+            </CardActions>
+          )}
+
+          {/* RATINGS */}
+          <Ratings blogId={viewblog.id} />
 
           <Box sx={{ mt: 2, px: 2, pb: 2 }}>
             <Typography variant="h6" sx={{ mb: 1 }}>
@@ -153,31 +155,23 @@ function ViewBlogs() {
 
             <Stack spacing={2}>
               {ratings.map((rating) => (
-                <Paper
-                  key={rating.id}
-                  elevation={2}
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                  }}
-                >
-                  {/* Top Section */}
-                  <Box>
-                    <Rating
-                      value={rating.rating}
-                      readOnly
-                      sx={{ color: "#FFD700", fontSize: "35px" }}
-                    />
+                <Paper key={rating.id} elevation={2} sx={{ p: 2 }}>
+                  <Rating
+                    value={rating.rating}
+                    readOnly
+                    sx={{ color: "#FFD700", fontSize: "35px" }}
+                  />
 
-                    {/* Description */}
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontSize: "20px", marginLeft: "8px" }}
-                    >
-                      {rating.description}
-                    </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontSize: "18px", ml: 1 }}
+                  >
+                    {rating.description}
+                  </Typography>
 
+                  {/* DELETE RATING (ONLY OWNER) */}
+                  {viewblog.isOwner && (
                     <Button
                       sx={{
                         mt: 1,
@@ -186,24 +180,20 @@ function ViewBlogs() {
                         bgcolor: "black",
                         color: "white",
                         textTransform: "capitalize",
-                        "&:hover": {
-                          bgcolor: "#333", // Optional: slightly lighter black on hover
-                        },
+                        "&:hover": { bgcolor: "#333" },
                       }}
                       size="small"
                       onClick={() => handleDeleteRating(rating.id)}
                     >
                       Delete
                     </Button>
-                  </Box>
-
-                  {/* <Divider sx={{ my: 1 }} /> */}
+                  )}
                 </Paper>
               ))}
             </Stack>
           </Box>
         </Card>
-      ))}
+      )}
     </div>
   );
 }

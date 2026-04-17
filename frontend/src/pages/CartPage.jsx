@@ -72,7 +72,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
     const res = await fetch("http://localhost:8080/order", {
       method: "POST",
       body: JSON.stringify({
-        amount: totalAmount * 100,
+        amount: totalAmount * 100, // bcoz amount will be in razorpay like Subunits(paisa) *100 = in Rs
         currency,
         receipt: receiptId,
       }),
