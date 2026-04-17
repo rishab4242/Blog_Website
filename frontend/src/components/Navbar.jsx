@@ -11,7 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
- 
+import toast from "react-hot-toast";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -35,99 +35,101 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  pointerEvents: "auto",
   cursor: "pointer",
-  zIndex: 1,
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   width: "100%",
-  // paddingRight: theme.spacing(6),
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 2),
   },
 }));
 
-
-
 export default function Navbar() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const navigate = useNavigate();
 
-  const NavigatetoCreateblog = () => {
-    navigate("/blogs/create");
-  };
+  const isLoggedIn = !!localStorage.getItem("token");
 
+  // 🔥 SEARCH
   const handleSearch = () => {
     if (searchTerm.trim() === "") {
       navigate("/blogs");
-    } else {
-      navigate(`/blogs/search/${searchTerm}`);
+      return;
     }
+    navigate(`/blogs/search/${searchTerm}`);
   };
 
-  const OpenSignupform = () => {
-    navigate("/blogs/signup");
-  };
+  // 🔥 NAV HELPERS
+  const goSignup = () => navigate("/blogs/signup");
+  const goLogin = () => navigate("/blogs/login");
+  const goCart = () => navigate("/blogs/add_to_cart");
 
-  const OpenLoginform = () => {
-    navigate("/blogs/login");
-  };
-
-  const isLoggedIn = !!localStorage.getItem("token");
-
-  const handleClick = () => {
+  // 🔥 CREATE BLOG PROTECTION
+  const handleCreateBlog = () => {
     if (!isLoggedIn) {
-      alert("Please Signup First");
-      navigate("/blogs/signup");
-    } else {
-      navigate("/blogs/create");
+      toast.error("Please login first 🔐", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+
+      navigate("/blogs/login");
+      return;
     }
+
+    navigate("/blogs/create");
   };
 
+  // 🔥 LOGOUT
   const handleLogout = () => {
     localStorage.removeItem("token");
-    alert("You Logout Successfully!");
+
+    toast.success("Logged out successfully 👋", {
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+    });
+
     navigate("/blogs/login");
   };
-
-  const goToCart = () => {
-  navigate("/blogs/add_to_cart");
-};
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          {/* Logo */}
+          {/* LOGO */}
           <Typography
             variant="h6"
-            noWrap
-            component="div"
             sx={{ fontWeight: "bold", cursor: "pointer" }}
           >
-            <Link to="/blogs">My Blog</Link>
+            <Link
+              to="/blogs"
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              My Blog
+            </Link>
           </Typography>
 
-          {/* Search Bar */}
+          {/* SEARCH */}
           <Search>
             <StyledInputBase
               placeholder="Search blogs…"
-              inputProps={{ "aria-label": "search" }}
               value={searchTerm}
               onChange={(e) => {
-                const value = e.target.value;
-                setSearchTerm(value);
+                setSearchTerm(e.target.value);
 
-                if (value.trim() === "") {
+                if (e.target.value.trim() === "") {
                   navigate("/blogs");
                 }
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearch();
-                }
+                if (e.key === "Enter") handleSearch();
               }}
             />
 
@@ -138,56 +140,36 @@ export default function Navbar() {
 
           <Box sx={{ flexGrow: 1 }} />
 
-          {/* Buttons */}
+          {/* ACTIONS */}
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-            {/* Cart */}
-            <IconButton color="inherit" onClick={goToCart}>
+            {/* CART */}
+            <IconButton color="inherit" onClick={goCart}>
               <Badge badgeContent={0} color="error">
-                <ShoppingCartIcon sx={{ fontSize: 32 }} />
+                <ShoppingCartIcon sx={{ fontSize: 30 }} />
               </Badge>
             </IconButton>
 
-            {isLoggedIn ? (
-              <>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleClick}
-                >
-                  Add New Blog
-                </Button>
+            {/* CREATE BLOG */}
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleCreateBlog}
+            >
+              Add New Blog
+            </Button>
 
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </>
+            {/* AUTH BUTTONS */}
+            {isLoggedIn ? (
+              <Button variant="contained" color="error" onClick={handleLogout}>
+                Logout
+              </Button>
             ) : (
               <>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleClick}
-                >
-                  Add New Blog
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  onClick={OpenLoginform}
-                >
+                <Button variant="outlined" color="inherit" onClick={goLogin}>
                   Login
                 </Button>
 
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={OpenSignupform}
-                >
+                <Button variant="contained" color="success" onClick={goSignup}>
                   Signup
                 </Button>
               </>

@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Ratings from "../components/Ratings";
 import { Box, Rating, Stack, Paper } from "@mui/material";
+import toast from "react-hot-toast";
 
 function ViewBlogs() {
   let [viewblog, setViewblog] = useState(null);
@@ -17,7 +18,7 @@ function ViewBlogs() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // FETCH BLOG
+  // 🔥 FETCH BLOG
   useEffect(() => {
     const fetchViewBlog = async () => {
       const token = localStorage.getItem("token");
@@ -30,13 +31,21 @@ function ViewBlogs() {
         setViewblog(res.data);
       } catch (error) {
         console.log(error);
+
+        toast.error("Failed to load blog", {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
       }
     };
 
     fetchViewBlog();
   }, [id]);
 
-  // FETCH RATINGS
+  // 🔥 FETCH RATINGS
   useEffect(() => {
     const fetchViewBlogRatings = async () => {
       try {
@@ -45,16 +54,26 @@ function ViewBlogs() {
         setRatings(res.data);
       } catch (error) {
         console.log(error);
+
+        toast.error("Failed to load ratings", {
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
       }
     };
 
     fetchViewBlogRatings();
   }, [id]);
 
+  // EDIT
   const navigateToeditpage = (id) => {
     navigate(`/blogs/${id}`);
   };
 
+  // 🔥 DELETE BLOG
   const handleDelete = async (id) => {
     const token = localStorage.getItem("token");
 
@@ -69,14 +88,31 @@ function ViewBlogs() {
         headers: { Authorization: token },
       });
 
-      alert(res.data.message);
+      toast.success(res.data.message || "Blog deleted", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+
       navigate("/blogs");
     } catch (error) {
       console.log(error);
+
+      toast.error("Delete failed", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
     }
   };
 
-  const handleDeleteRating = async (id) => {
+  // 🔥 DELETE RATING
+  const handleDeleteRating = async (ratingId) => {
+    const token = localStorage.getItem("token");
     const confirmAction = window.confirm(
       "Are you sure you want to delete this Rating?",
     );
@@ -85,14 +121,33 @@ function ViewBlogs() {
 
     try {
       let res = await axios.delete(
-        `http://localhost:8080/blogs/${id}/rating/delete`,
+        `http://localhost:8080/blogs/${ratingId}/rating/delete`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
 
-      setRatings((prev) => prev.filter((rating) => rating.id !== id));
+      setRatings((prev) => prev.filter((rating) => rating.id !== ratingId));
 
-      alert(res.data.message);
+      toast.success(res.data.message || "Rating deleted", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
     } catch (error) {
       console.log(error);
+
+      toast.error("Failed to delete rating", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
     }
   };
 
@@ -100,6 +155,7 @@ function ViewBlogs() {
     <div style={{ display: "flex", justifyContent: "center" }}>
       {viewblog && (
         <Card sx={{ maxWidth: 345, m: 2, borderRadius: 3, boxShadow: 3 }}>
+          {/* Image */}
           <CardMedia
             component="img"
             sx={{ padding: "10px" }}
@@ -108,6 +164,7 @@ function ViewBlogs() {
             alt={viewblog.title}
           />
 
+          {/* Content */}
           <CardContent>
             <Typography gutterBottom variant="h5">
               {viewblog.title}
@@ -148,6 +205,7 @@ function ViewBlogs() {
           {/* RATINGS */}
           <Ratings blogId={viewblog.id} />
 
+          {/* REVIEWS */}
           <Box sx={{ mt: 2, px: 2, pb: 2 }}>
             <Typography variant="h6" sx={{ mb: 1 }}>
               User Reviews
@@ -170,7 +228,6 @@ function ViewBlogs() {
                     {rating.description}
                   </Typography>
 
-                  {/* DELETE RATING (ONLY OWNER) */}
                   {viewblog.isOwner && (
                     <Button
                       sx={{

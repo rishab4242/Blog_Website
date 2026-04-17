@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import BlogCard from "../components/BlogCard";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function AllBlogs({ setCartItems }) {
   let [blogs, setBlogs] = useState([]);
@@ -10,32 +11,56 @@ function AllBlogs({ setCartItems }) {
 
   const addToCart = (blog) => {
     setCartItems((prev) => [...prev, blog]);
+
+    toast.success("Added to cart 🛒", {
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+    });
   };
 
   useEffect(() => {
     const fetchAllBlogs = async () => {
       const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/blogs/login");
+        return;
+      }
+
       try {
-        let res = await axios.get("http://localhost:8080/blogs/", {
+        const res = await axios.get("http://localhost:8080/blogs/", {
           headers: {
             Authorization: token,
           },
         });
+
         setBlogs(res.data);
-        if (!token) {
-          navigate("/blogs/login");
-        }
       } catch (error) {
         console.log(error);
+
+        if (error.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/blogs/login");
+        }
       }
     };
+
     fetchAllBlogs();
-  }, []);
+  }, [navigate]);
 
   return (
     <>
       <div
-        style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 300px))",
+          gap: "30px",
+          margin: "35px",
+          justifyContent: "center",
+        }}
       >
         {blogs.map((blog) => (
           <div key={blog.id}>

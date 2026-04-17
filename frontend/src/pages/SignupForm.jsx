@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function SignupForm() {
   const [formData, setFormData] = React.useState({
@@ -17,32 +18,100 @@ export default function SignupForm() {
     password: "",
   });
 
+  const [errors, setErrors] = React.useState({});
+  const [loading, setLoading] = React.useState(false);
+
   const navigate = useNavigate();
 
+  // 🔥 HANDLE CHANGE
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+
+    // clear error on typing
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
   };
 
+  // 🔥 VALIDATION
+  const validate = () => {
+    let temp = {};
+
+    if (!formData.username) temp.username = "Username is required";
+
+    if (!formData.email) temp.email = "Email is required";
+
+    if (!formData.email.includes("@")) temp.email = "Invalid email format";
+
+    if (!formData.password) temp.password = "Password is required";
+
+    if (formData.password.length < 6)
+      temp.password = "Password must be at least 6 characters";
+
+    setErrors(temp);
+
+    return Object.keys(temp).length === 0;
+  };
+
+  // 🔥 SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validate()) {
+      toast.error("Please fix form errors", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+      return;
+    }
+
+    setLoading(true);
+
     try {
       let res = await axios.post(
         "http://localhost:8080/blogs/signup",
         formData,
       );
-      alert(res.data.message);
+
+      // 🔥 SUCCESS TOAST
+      toast.success(res.data.message || "Account created 🎉", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+
+      // reset form
       setFormData({
         username: "",
         email: "",
         password: "",
       });
+
       navigate("/blogs/login");
     } catch (error) {
       console.log(error);
-      alert(res.data.error.message);
+
+      // 🔥 SAFE ERROR HANDLING
+      toast.error(error?.response?.data?.message || "Signup failed", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,54 +135,71 @@ export default function SignupForm() {
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+          {/* Username */}
           <TextField
             fullWidth
             label="Enter Username"
             name="username"
             margin="normal"
+            value={formData.username}
             onChange={handleChange}
-            required
+            error={!!errors.username}
+            helperText={errors.username}
           />
 
+          {/* Email */}
           <TextField
             fullWidth
             label="Email"
             name="email"
             type="email"
             margin="normal"
+            value={formData.email}
             onChange={handleChange}
-            required
+            error={!!errors.email}
+            helperText={errors.email}
           />
 
+          {/* Password */}
           <TextField
             fullWidth
             label="Password"
             name="password"
             type="password"
             margin="normal"
+            value={formData.password}
             onChange={handleChange}
-            required
+            error={!!errors.password}
+            helperText={errors.password}
           />
 
+          {/* Submit */}
           <Button
             fullWidth
             variant="contained"
-            color="primary"
             type="submit"
+            disabled={loading}
             sx={{
               mt: 3,
               py: 1.5,
               fontSize: "16px",
               borderRadius: 2,
+              textTransform: "none",
             }}
           >
-            Sign Up
+            {loading ? "Creating..." : "Sign Up"}
           </Button>
         </Box>
+
+        {/* Login link */}
         <Typography align="center" sx={{ mt: 2 }}>
           Already have account?{" "}
           <span
-            style={{ color: "blue", cursor: "pointer", fontWeight: "bold" }}
+            style={{
+              color: "blue",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
             onClick={() => navigate("/blogs/login")}
           >
             Login

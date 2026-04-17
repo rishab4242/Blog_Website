@@ -244,7 +244,7 @@ app.delete("/blogs/:id/rating/delete", authMiddleware, (req, res) => {
   const currentUserId = req.user.id;
   let { id } = req.params;
 
-  let q = `DELETE FROM blogs WHERE id = ? AND user_id = ?`;
+  let q = `DELETE FROM ratings WHERE id = ? AND user_id = ?`;
 
   try {
     connection.query(q, [id, currentUserId], (err, result) => {

@@ -16,10 +16,18 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import toast from "react-hot-toast";
 
 const CartPage = ({ cartItems, setCartItems }) => {
   const handleRemove = (id) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
+    toast.error("Item removed", {
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+    });
   };
 
   const handleIncrease = (id) => {
@@ -28,6 +36,16 @@ const CartPage = ({ cartItems, setCartItems }) => {
         item.id === id ? { ...item, qty: (item.qty || 1) + 1 } : item,
       ),
     );
+    toast("Quantity increased ➕");
+    toast.dismiss();
+    toast("Quantity updated", {
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+      icon: "📈",
+    });
   };
 
   const handleDecrease = (id) => {
@@ -38,9 +56,29 @@ const CartPage = ({ cartItems, setCartItems }) => {
           : item,
       ),
     );
+    toast("Quantity decreased ➖");
+    toast.dismiss();
+    toast("Quantity decreased", {
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+      icon: "📉",
+    });
   };
 
-  const handleEmptyCart = () => setCartItems([]);
+  const handleEmptyCart = () => {
+    setCartItems([]);
+
+    toast.success("Cart cleared 🧹", {
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+    });
+  };
 
   const totalPrice = cartItems.reduce(
     (total, item) => total + Number(item.price) * (item.qty || 1),

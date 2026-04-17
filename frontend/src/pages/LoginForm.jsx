@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -18,36 +19,93 @@ export default function LoginForm() {
     password: "",
   });
 
+  const [errors, setErrors] = React.useState({});
+  const [loading, setLoading] = React.useState(false);
+
+  // 🔥 HANDLE CHANGE
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
   };
 
+  // 🔥 VALIDATION
+  const validate = () => {
+    let temp = {};
+
+    if (!formData.email) temp.email = "Email is required";
+
+    if (!formData.email.includes("@")) temp.email = "Invalid email format";
+
+    if (!formData.password) temp.password = "Password is required";
+
+    if (formData.password.length < 3)
+      temp.password = "Password must be at least 6 characters";
+
+    setErrors(temp);
+
+    return Object.keys(temp).length === 0;
+  };
+
+  // 🔥 SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validate()) {
+      toast.error("Please fix form errors", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+      return;
+    }
+
+    setLoading(true);
 
     try {
       let res = await axios.post("http://localhost:8080/blogs/login", formData);
 
+      // save token
       localStorage.setItem("token", res.data.token);
 
-      console.log(res.data.token);
+      // 🔥 SUCCESS TOAST
+      toast.success(res.data.message || "Login successful 🎉", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
 
-      alert(res.data.message);
-      navigate("/blogs");
+      // reset form
       setFormData({
         email: "",
         password: "",
       });
+
+      navigate("/blogs");
     } catch (error) {
       console.log(error);
-      alert(error.res?.data?.message || "Login failed");
-      setFormData({
-        email: "",
-        password: "",
+
+      toast.error(error?.response?.data?.message || "Login failed", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,6 +129,7 @@ export default function LoginForm() {
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+          {/* Email */}
           <TextField
             fullWidth
             label="Email"
@@ -79,9 +138,11 @@ export default function LoginForm() {
             margin="normal"
             value={formData.email}
             onChange={handleChange}
-            required
+            error={!!errors.email}
+            helperText={errors.email}
           />
 
+          {/* Password */}
           <TextField
             fullWidth
             label="Password"
@@ -90,33 +151,42 @@ export default function LoginForm() {
             margin="normal"
             value={formData.password}
             onChange={handleChange}
-            required
+            error={!!errors.password}
+            helperText={errors.password}
           />
 
+          {/* Submit */}
           <Button
             fullWidth
             variant="contained"
-            color="primary"
             type="submit"
+            disabled={loading}
             sx={{
               mt: 3,
               py: 1.5,
               fontSize: "16px",
               borderRadius: 2,
+              textTransform: "none",
             }}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </Button>
         </Box>
+
+        {/* Signup link */}
         <Typography align="center" sx={{ mt: 2 }}>
-                  Don't have account?{" "}
-                  <span
-                    style={{ color: "blue", cursor: "pointer", fontWeight: "bold" }}
-                    onClick={() => navigate("/blogs/signup")}
-                  >
-                    Signup
-                  </span>
-                </Typography>
+          Don't have account?{" "}
+          <span
+            style={{
+              color: "blue",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
+            onClick={() => navigate("/blogs/signup")}
+          >
+            Signup
+          </span>
+        </Typography>
       </Paper>
     </Container>
   );

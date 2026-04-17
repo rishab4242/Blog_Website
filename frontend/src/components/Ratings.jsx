@@ -1,15 +1,30 @@
 import * as React from "react";
 import { Box, Rating, Typography, TextField, Button } from "@mui/material";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Ratings({ blogId }) {
   const [value, setValue] = React.useState(0);
   const [desc, setDesc] = React.useState("");
-
-  const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
 
   const handleSubmit = async () => {
+    const token = localStorage.getItem("token");
+
+    // 🔥 VALIDATION
+    if (!value) {
+      toast.error("Please give rating ⭐", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+      return;
+    }
+
+    setLoading(true);
+
     try {
       let res = await axios.post(
         `http://localhost:8080/blogs/${blogId}/rating`,
@@ -17,15 +32,38 @@ function Ratings({ blogId }) {
           rating: value,
           description: desc,
         },
+        {
+          headers: {
+            Authorization: token,
+          },
+        },
       );
 
-      alert(res.data.message);
+      // 🔥 SUCCESS TOAST
+      toast.success(res.data.message || "Rating submitted 🎉", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+
+      // reset form
       setValue(0);
       setDesc("");
-      navigate("/blogs");
     } catch (err) {
       console.log(err);
-      alert(res.data.error.message);
+
+      // 🔥 SAFE ERROR HANDLING
+      toast.error(err?.response?.data?.message || "Failed to submit rating", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,12 +71,14 @@ function Ratings({ blogId }) {
     <Box sx={{ p: 2 }}>
       <Typography component="legend">Give Your Rating</Typography>
 
+      {/* STAR RATING */}
       <Rating
         value={value}
         onChange={(event, newValue) => setValue(newValue)}
         sx={{ color: "#FFD700", fontSize: 30 }}
       />
 
+      {/* DESCRIPTION */}
       <TextField
         fullWidth
         multiline
@@ -47,15 +87,22 @@ function Ratings({ blogId }) {
         value={desc}
         onChange={(e) => setDesc(e.target.value)}
         sx={{ mt: 1 }}
+        inputProps={{ maxLength: 255 }}
+        helperText="Max 255 characters"
       />
 
+      {/* SUBMIT BUTTON */}
       <Button
         variant="contained"
         size="small"
-        sx={{ mt: 1 }}
+        sx={{
+          mt: 1,
+          textTransform: "none",
+        }}
         onClick={handleSubmit}
+        disabled={loading}
       >
-        Submit
+        {loading ? "Submitting..." : "Submit"}
       </Button>
     </Box>
   );

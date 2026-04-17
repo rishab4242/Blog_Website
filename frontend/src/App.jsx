@@ -9,6 +9,7 @@ import SignupForm from "./pages/SignupForm";
 import LoginForm from "./pages/LoginForm";
 import CartPage from "./pages/CartPage";
 import { useState, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -19,8 +20,12 @@ function App() {
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
+
+ 
+
   return (
     <>
+      <Toaster position="top-center" reverseOrder={false} />
       <Navbar />
       <Routes>
         <Route

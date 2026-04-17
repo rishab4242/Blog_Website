@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function CreateBlog() {
   const [blogs, setBlogs] = useState({
@@ -18,27 +19,72 @@ function CreateBlog() {
     description: "",
   });
 
+  const [file, setFile] = useState(null);
   const navigate = useNavigate();
 
-  const [file, setFile] = useState(null); // separate state for file
+  // 🔥 basic validation errors state
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    setBlogs((currBlogs) => ({
-      ...currBlogs,
-      [e.target.name]: e.target.value,
+    const { name, value } = e.target;
+
+    // update state
+    setBlogs((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // live validation clear
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
     }));
   };
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]); // save file object
+    setFile(e.target.files[0]);
+    setErrors((prev) => ({ ...prev, img: "" }));
+  };
+
+  // 🔥 FRONTEND VALIDATION (IMPORTANT)
+  const validate = () => {
+    let tempErrors = {};
+
+    if (!blogs.title) tempErrors.title = "Title is required";
+    if (!blogs.price) tempErrors.price = "Price is required";
+    if (!blogs.content) tempErrors.content = "Content is required";
+    if (blogs.content.length > 255)
+      tempErrors.content = "Content max 255 characters allowed";
+
+    if (blogs.description.length > 255)
+      tempErrors.description = "Description max 255 characters allowed";
+
+    if (!file) tempErrors.img = "Image is required";
+
+    setErrors(tempErrors);
+
+    return Object.keys(tempErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
-    const token = localStorage.getItem("token");
     e.preventDefault();
 
-    if (!file) {
-      alert("Please select an image");
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/blogs/login");
+      return;
+    }
+
+    // 🔥 STOP if validation fails
+    if (!validate()) {
+      toast.error("Please fix form errors", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
       return;
     }
 
@@ -47,7 +93,7 @@ function CreateBlog() {
     formData.append("price", blogs.price);
     formData.append("content", blogs.content);
     formData.append("description", blogs.description);
-    formData.append("img", file); // must match Multer field name
+    formData.append("img", file);
 
     try {
       const res = await axios.post(
@@ -61,9 +107,16 @@ function CreateBlog() {
         },
       );
 
-      alert(res.data); // success message
+      // 🔥 SUCCESS TOAST (no alert anymore)
+      toast.success("Blog created successfully 🎉", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
 
-      // Reset form
+      // reset
       setBlogs({
         title: "",
         price: "",
@@ -71,10 +124,23 @@ function CreateBlog() {
         description: "",
       });
       setFile(null);
+
       navigate("/blogs");
     } catch (error) {
       console.log(error);
-      alert("Something went wrong");
+
+      // 🔥 CLEAN ERROR MESSAGE
+      toast.error(error?.response?.data?.message || "Something went wrong", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/blogs/login");
+      }
     }
   };
 
@@ -90,21 +156,34 @@ function CreateBlog() {
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
           onSubmit={handleSubmit}
         >
-          {/* Blog Title */}
+          {/* Title */}
           <TextField
             label="Blog Title"
             name="title"
             value={blogs.title}
             onChange={handleChange}
+            error={!!errors.title}
+            helperText={errors.title}
             fullWidth
-            required
           />
 
-          {/* Image Upload */}
+          {/* Image */}
           <Button variant="outlined" component="label">
             Upload Image
-            <input type="file" name="img" onChange={handleFileChange} hidden />
+            <input
+              type="file"
+              name="img"
+              onChange={handleFileChange}
+              hidden
+              accept="image/*"
+            />
           </Button>
+
+          {errors.img && (
+            <Typography color="error" fontSize="0.8rem">
+              {errors.img}
+            </Typography>
+          )}
 
           {/* Price */}
           <TextField
@@ -113,8 +192,9 @@ function CreateBlog() {
             name="price"
             value={blogs.price}
             onChange={handleChange}
+            error={!!errors.price}
+            helperText={errors.price}
             fullWidth
-            required
           />
 
           {/* Content */}
@@ -125,8 +205,10 @@ function CreateBlog() {
             name="content"
             value={blogs.content}
             onChange={handleChange}
+            error={!!errors.content}
+            helperText={errors.content || "Max 255 characters allowed"}
+            inputProps={{ maxLength: 255 }}
             fullWidth
-            required
           />
 
           {/* Description */}
@@ -137,6 +219,9 @@ function CreateBlog() {
             name="description"
             value={blogs.description}
             onChange={handleChange}
+            error={!!errors.description}
+            helperText={errors.description || "Max 255 characters allowed"}
+            inputProps={{ maxLength: 255 }}
             fullWidth
           />
 
@@ -144,8 +229,8 @@ function CreateBlog() {
           <Button
             type="submit"
             variant="contained"
-            color="primary"
             size="large"
+            sx={{ textTransform: "none" }}
           >
             Submit Blog
           </Button>

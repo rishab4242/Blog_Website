@@ -15,15 +15,21 @@ import Chip from "@mui/material/Chip";
 import StarIcon from "@mui/icons-material/Star";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import { useState } from "react";
 
 const BlogCard = ({ blog, addToCart }) => {
-  // console.log(blog);
+  const [expanded, setExpanded] = useState(false);
+
+  const limit = 21;
+  const isLong = blog.content.length > limit;
+
+  const displayText = expanded ? blog.content : blog.content.slice(0, limit);
 
   return (
     <Card
       sx={{
         width: 320,
-        m: 2,
+        maxWidth: "300px",
         borderRadius: 3,
         boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
         transition: "0.3s",
@@ -38,15 +44,14 @@ const BlogCard = ({ blog, addToCart }) => {
       <Link to={`/blogs/${blog.id}/view`}>
         <CardMedia
           component="img"
-          height="200"
           image={`http://localhost:8080/uploads/${blog.image}`}
           alt={blog.title}
-          sx={{ objectFit: "cover", padding: "15px" }}
+          sx={{ height: 160, objectFit: "cover", padding: "15px" }}
         />
       </Link>
 
       {/* Content */}
-      <CardContent sx={{ pb: 0, pt: 1.5, px: 2 }}>
+      <CardContent sx={{ pb: 0, pt: 1.5, px: 2, flexGrow: 1 }}>
         {/* Title + Rating Row */}
         <Stack
           direction="row"
@@ -95,8 +100,23 @@ const BlogCard = ({ blog, addToCart }) => {
             color="text.secondary"
             sx={{ fontSize: "0.8rem" }}
           >
-            {blog.content}
+            {displayText}
+
+            {isLong && (
+              <span
+                onClick={() => setExpanded(!expanded)}
+                style={{
+                  color: "#ff6b6b",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  marginLeft: "4px",
+                }}
+              >
+                {expanded ? " Show Less" : "...Read More"}
+              </span>
+            )}
           </Typography>
+
           <Typography
             variant="body1"
             fontWeight="bold"
