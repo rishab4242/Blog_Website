@@ -3,7 +3,7 @@ import { Box, Rating, Typography, TextField, Button } from "@mui/material";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-function Ratings({ blogId }) {
+function Ratings({ blogId, refreshRatings }) {
   const [value, setValue] = React.useState(0);
   const [desc, setDesc] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -38,7 +38,7 @@ function Ratings({ blogId }) {
           },
         },
       );
-
+      refreshRatings();
       // 🔥 SUCCESS TOAST
       toast.success(res.data.message || "Rating submitted 🎉", {
         style: {

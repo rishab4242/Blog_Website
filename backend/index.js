@@ -28,12 +28,7 @@ const connection = mysql.createConnection({
 });
 
 app.get("/blogs", (req, res) => {
-  let q = `
-    SELECT b.*, r.rating 
-    FROM blogs b
-    LEFT JOIN ratings r 
-    ON r.id = b.rating_id
-  `;
+  let q = `SELECT * FROM blogs`;
   try {
     connection.query(q, (err, result) => {
       if (err) throw err;
@@ -61,7 +56,7 @@ app.get("/blogs/:id/view", authMiddleware, (req, res) => {
 
     let blog = result[0]; // 👈 important
 
-    blog.isOwner = Number(blog.user_id) === Number(req.user.id);
+    blog.isOwner = blog.user_id === currentUserId;
     res.send(blog);
   });
 });
@@ -206,59 +201,94 @@ app.delete("/blogs/:id/delete", authMiddleware, (req, res) => {
   });
 });
 
-app.post("/blogs/:id/rating", (req, res) => {
+app.post("/blogs/:id/rating", authMiddleware, (req, res) => {
   let { id } = req.params;
+  const user_id = req.user.id;
   let { rating, description } = req.body;
 
-  let q = "INSERT INTO ratings (blog_id, rating, description) VALUES (?, ?, ?)";
+  let insertQuery =
+    "INSERT INTO ratings (user_id, blog_id, rating, description) VALUES (?,?, ?, ?)";
 
-  try {
-    connection.query(q, [id, rating, description], (err, result) => {
+  connection.query(
+    insertQuery,
+    [user_id, id, rating, description],
+    (err, result) => {
       if (err) return res.status(500).send(err);
 
+      // 🔥 UPDATE AVERAGE RATING
+      const avgQuery = `
+        UPDATE blogs 
+        SET average_rating = (
+          SELECT AVG(rating) FROM ratings WHERE blog_id = ?
+        )
+        WHERE id = ?
+      `;
+
+      connection.query(avgQuery, [id, id]);
+
       res.json({ message: "Rating added successfully" });
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Some thing went wrong!" });
-  }
+    },
+  );
 });
 
-app.get("/blogs/:id/rating", (req, res) => {
-  const { id } = req.params;
+app.get("/blogs/:id/rating", authMiddleware, (req, res) => {
+  const blogId = req.params.id;
+  const currentUserId = req.user.id;
 
-  let q1 = `SELECT * FROM ratings WHERE blog_id='${id}'`;
+  let q = `
+    SELECT 
+      id, 
+      user_id, 
+      rating, 
+      description,
+      (user_id = ?) AS isOwner
+    FROM ratings
+    WHERE blog_id = ?
+  `;
 
-  try {
-    connection.query(q1, (err, result) => {
-      if (err) throw err;
-      res.send(result);
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "No Rating Found" });
-  }
+  connection.query(q, [currentUserId, blogId], (err, result) => {
+    if (err) return res.status(500).send(err);
+
+    res.json(result);
+  });
 });
 
 app.delete("/blogs/:id/rating/delete", authMiddleware, (req, res) => {
   const currentUserId = req.user.id;
-  let { id } = req.params;
+  const ratingId = req.params.id;
 
-  let q = `DELETE FROM ratings WHERE id = ? AND user_id = ?`;
+  // 🔥 STEP 1: get blog_id FIRST
+  const getBlogQuery = `SELECT blog_id FROM ratings WHERE id = ? AND user_id = ?`;
 
-  try {
-    connection.query(q, [id, currentUserId], (err, result) => {
-      if (err) throw err;
-      res.status(200).json({ message: "Rating Deleted Successfully!" });
+  connection.query(getBlogQuery, [ratingId, currentUserId], (err, data) => {
+    if (err) return res.status(500).json(err);
 
-      let blog = result;
+    const blogId = data[0]?.blog_id;
 
-      blog.isOwner = blog.user_id === currentUserId;
+    if (!blogId) {
+      return res.status(404).json({ message: "Rating not found" });
+    }
+
+    // 🔥 STEP 2: delete rating
+    const deleteQuery = `DELETE FROM ratings WHERE id = ? AND user_id = ?`;
+
+    connection.query(deleteQuery, [ratingId, currentUserId], (err2) => {
+      if (err2) return res.status(500).json(err2);
+
+      // 🔥 STEP 3: reset blog rating
+      const updateQuery = `
+        UPDATE blogs 
+        SET average_rating = 0
+        WHERE id = ?
+      `;
+
+      connection.query(updateQuery, [blogId], (err3) => {
+        if (err3) return res.status(500).json(err3);
+
+        res.json({ message: "Rating Deleted" });
+      });
     });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "ERROR OCCURED !!" });
-  }
+  });
 });
 
 app.post("/blogs/signup", async (req, res) => {

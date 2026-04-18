@@ -14,6 +14,8 @@ import {
 } from "@mui/material";
 
 import toast from "react-hot-toast";
+import { isTokenExpired } from "../utils/auth.js";
+
 
 function EditBlog() {
   const [editblog, setEditblog] = useState({
@@ -33,6 +35,12 @@ function EditBlog() {
   useEffect(() => {
     const editData = async () => {
       const token = localStorage.getItem("token");
+
+      if (!token || isTokenExpired(token)) {
+        localStorage.removeItem("token");
+        navigate("/blogs/login");
+        return;
+      }
 
       try {
         const res = await axios.get(`http://localhost:8080/blogs/${id}`, {

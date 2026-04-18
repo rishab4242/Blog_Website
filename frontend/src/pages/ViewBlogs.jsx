@@ -10,6 +10,7 @@ import axios from "axios";
 import Ratings from "../components/Ratings";
 import { Box, Rating, Stack, Paper } from "@mui/material";
 import toast from "react-hot-toast";
+import { isTokenExpired } from "../utils/auth.js";
 
 function ViewBlogs() {
   let [viewblog, setViewblog] = useState(null);
@@ -22,6 +23,12 @@ function ViewBlogs() {
   useEffect(() => {
     const fetchViewBlog = async () => {
       const token = localStorage.getItem("token");
+
+      if (!token || isTokenExpired(token)) {
+        localStorage.removeItem("token");
+        navigate("/blogs/login");
+        return;
+      }
 
       try {
         let res = await axios.get(`http://localhost:8080/blogs/${id}/view`, {
@@ -45,11 +52,31 @@ function ViewBlogs() {
     fetchViewBlog();
   }, [id]);
 
+  const fetchViewBlogRatings = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      let res = await axios.get(`http://localhost:8080/blogs/${id}/rating`, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      setRatings(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // 🔥 FETCH RATINGS
   useEffect(() => {
     const fetchViewBlogRatings = async () => {
+      const token = localStorage.getItem("token");
       try {
-        let res = await axios.get(`http://localhost:8080/blogs/${id}/rating`);
+        let res = await axios.get(`http://localhost:8080/blogs/${id}/rating`, {
+          headers: {
+            Authorization: token,
+          },
+        });
 
         setRatings(res.data);
       } catch (error) {
@@ -203,7 +230,7 @@ function ViewBlogs() {
           )}
 
           {/* RATINGS */}
-          <Ratings blogId={viewblog.id} />
+          <Ratings blogId={viewblog.id} refreshRatings={fetchViewBlogRatings} />
 
           {/* REVIEWS */}
           <Box sx={{ mt: 2, px: 2, pb: 2 }}>
@@ -227,8 +254,7 @@ function ViewBlogs() {
                   >
                     {rating.description}
                   </Typography>
-
-                  {viewblog.isOwner && (
+                  {rating.isOwner ? (
                     <Button
                       sx={{
                         mt: 1,
@@ -244,7 +270,7 @@ function ViewBlogs() {
                     >
                       Delete
                     </Button>
-                  )}
+                  ) : null}
                 </Paper>
               ))}
             </Stack>

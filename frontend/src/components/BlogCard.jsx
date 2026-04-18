@@ -66,14 +66,14 @@ const BlogCard = ({ blog, addToCart }) => {
             {blog.title}
           </Typography>
 
-          {blog.rating ? (
+          {blog.average_rating ? (
             <Chip
               icon={
                 <StarIcon
                   sx={{ fontSize: "0.95rem", color: "#fff !important" }}
                 />
               }
-              label={blog.rating}
+              label={blog.average_rating}
               size="small"
               sx={{
                 bgcolor: "#4caf50",

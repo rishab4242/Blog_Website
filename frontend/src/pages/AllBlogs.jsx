@@ -3,6 +3,7 @@ import axios from "axios";
 import BlogCard from "../components/BlogCard";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { isTokenExpired } from "../utils/auth.js";
 
 function AllBlogs({ setCartItems }) {
   let [blogs, setBlogs] = useState([]);
@@ -25,6 +26,12 @@ function AllBlogs({ setCartItems }) {
     const fetchAllBlogs = async () => {
       const token = localStorage.getItem("token");
 
+      if (!token || isTokenExpired(token)) {
+        localStorage.removeItem("token");
+        navigate("/blogs/login");
+        return;
+      }
+
       if (!token) {
         navigate("/blogs/login");
         return;
@@ -40,11 +47,6 @@ function AllBlogs({ setCartItems }) {
         setBlogs(res.data);
       } catch (error) {
         console.log(error);
-
-        if (error.response?.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/blogs/login");
-        }
       }
     };
 
