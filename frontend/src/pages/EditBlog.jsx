@@ -16,7 +16,6 @@ import {
 import toast from "react-hot-toast";
 import { isTokenExpired } from "../utils/auth.js";
 
-
 function EditBlog() {
   const [editblog, setEditblog] = useState({
     title: "",
@@ -30,6 +29,29 @@ function EditBlog() {
 
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const validateField = (name, value) => {
+    let error = "";
+
+    if (name === "title") {
+      if (!value.trim()) error = "Title is required";
+    }
+
+    if (name === "price") {
+      if (!value) error = "Price is required";
+    }
+
+    if (name === "content") {
+      if (!value.trim()) error = "Content is required";
+      else if (value.length > 255) error = "Content max 255 characters allowed";
+    }
+
+    if (name === "description") {
+      if (value.length > 255) error = "Description max 255 characters allowed";
+    }
+
+    return error;
+  };
 
   // 🔥 FETCH BLOG
   useEffect(() => {
@@ -65,9 +87,12 @@ function EditBlog() {
       [name]: value,
     }));
 
+    // validate instantly
+    const error = validateField(name, value);
+
     setErrors((prev) => ({
       ...prev,
-      [name]: "",
+      [name]: error,
     }));
   };
 
@@ -78,18 +103,13 @@ function EditBlog() {
   };
 
   // 🔥 VALIDATION
-  const validate = () => {
+  const validateForm = () => {
     let temp = {};
 
-    if (!editblog.title) temp.title = "Title is required";
-    if (!editblog.price) temp.price = "Price is required";
-    if (!editblog.content) temp.content = "Content is required";
-
-    if (editblog.content?.length > 255)
-      temp.content = "Content max 255 characters allowed";
-
-    if (editblog.description?.length > 255)
-      temp.description = "Description max 255 characters allowed";
+    Object.keys(editblog).forEach((key) => {
+      const error = validateField(key, editblog[key] || "");
+      if (error) temp[key] = error;
+    });
 
     setErrors(temp);
 
@@ -102,7 +122,7 @@ function EditBlog() {
 
     const token = localStorage.getItem("token");
 
-    if (!validate()) {
+    if (!validateForm()) {
       toast.error("Please fix errors in form", {
         style: {
           borderRadius: "10px",
@@ -256,7 +276,17 @@ function EditBlog() {
           />
 
           {/* Submit */}
-          <Button type="submit" variant="contained" size="large">
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={
+              !editblog.title?.trim() ||
+              !editblog.price ||
+              !editblog.content?.trim() ||
+              Object.values(errors).some((err) => err)
+            }
+          >
             Update Blog
           </Button>
         </Box>
