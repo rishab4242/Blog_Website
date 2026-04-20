@@ -44,7 +44,7 @@ const BlogCard = ({ blog, addToCart }) => {
       <Link to={`/blogs/${blog.id}/view`}>
         <CardMedia
           component="img"
-          image={`http://localhost:8080/uploads/${blog.image}`}
+          image={`http://localhost:8080/${blog.image}`}
           alt={blog.title}
           sx={{ height: 160, objectFit: "cover", padding: "15px" }}
         />

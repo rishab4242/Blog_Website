@@ -55,21 +55,25 @@ function AllBlogs({ setCartItems }) {
 
   return (
     <>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 300px))",
-          gap: "30px",
-          margin: "35px",
-          justifyContent: "center",
-        }}
-      >
-        {blogs.map((blog) => (
-          <div key={blog.id}>
-            <BlogCard blog={blog} addToCart={addToCart} />
-          </div>
-        ))}
-      </div>
+      {blogs.length > 0 ? (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 300px))",
+            gap: "30px",
+            margin: "35px",
+            justifyContent: "center",
+          }}
+        >
+          {blogs.map((blog) => (
+            <div key={blog.id}>
+              <BlogCard blog={blog} addToCart={addToCart} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-red-500 text-center relative top-70 ">No Blog Found!!</p>
+      )}
     </>
   );
 }

@@ -25,6 +25,29 @@ function CreateBlog() {
   // 🔥 basic validation errors state
   const [errors, setErrors] = useState({});
 
+  const validateField = (name, value) => {
+    let error = "";
+
+    if (name === "title") {
+      if (!value.trim()) error = "Title is required";
+    }
+
+    if (name === "price") {
+      if (!value) error = "Price is required";
+    }
+
+    if (name === "content") {
+      if (!value.trim()) error = "Content is required";
+      else if (value.length > 255) error = "Content max 255 characters allowed";
+    }
+
+    if (name === "description") {
+      if (value.length > 255) error = "Description max 255 characters allowed";
+    }
+
+    return error;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -35,9 +58,11 @@ function CreateBlog() {
     }));
 
     // live validation clear
+    const error = validateField(name, value);
+
     setErrors((prev) => ({
       ...prev,
-      [name]: "",
+      [name]: error,
     }));
   };
 
@@ -47,23 +72,22 @@ function CreateBlog() {
   };
 
   // 🔥 FRONTEND VALIDATION (IMPORTANT)
-  const validate = () => {
-    let tempErrors = {};
+  // 🔥 VALIDATION
+  const validateForm = () => {
+    let temp = {};
 
-    if (!blogs.title) tempErrors.title = "Title is required";
-    if (!blogs.price) tempErrors.price = "Price is required";
-    if (!blogs.content) tempErrors.content = "Content is required";
-    if (blogs.content.length > 255)
-      tempErrors.content = "Content max 255 characters allowed";
+    Object.keys(blogs).forEach((key) => {
+      const error = validateField(key, blogs[key] || "");
+      if (error) temp[key] = error;
+    });
 
-    if (blogs.description.length > 255)
-      tempErrors.description = "Description max 255 characters allowed";
+    if (!file) {
+      temp.img = "Image is required";
+    }
 
-    if (!file) tempErrors.img = "Image is required";
+    setErrors(temp);
 
-    setErrors(tempErrors);
-
-    return Object.keys(tempErrors).length === 0;
+    return Object.keys(temp).length === 0;
   };
 
   const handleSubmit = async (e) => {
@@ -77,8 +101,8 @@ function CreateBlog() {
     }
 
     // 🔥 STOP if validation fails
-    if (!validate()) {
-      toast.error("Please fix form errors", {
+    if (!validateForm()) {
+      toast.error("Please fix errors in form", {
         style: {
           borderRadius: "10px",
           background: "#333",

@@ -219,7 +219,7 @@ function EditBlog() {
               <CardMedia
                 component="img"
                 height="180"
-                image={`http://localhost:8080/uploads/${editblog.image}`}
+                image={`http://localhost:8080/${editblog.image}`}
               />
             </Card>
           )}

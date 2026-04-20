@@ -144,7 +144,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
           },
         );
         const jsonRes = await validateRes.json();
-        console.log(jsonRes);
+        // console.log(jsonRes);
       },
       prefill: {
         //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
@@ -279,7 +279,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
                   {/* Image */}
                   <TableCell sx={{ py: 1.2, px: 2 }}>
                     <img
-                      src={`http://localhost:8080/uploads/${item.image}`}
+                      src={`http://localhost:8080/${item.image}`}
                       alt={item.title}
                       style={{
                         width: 64, // ⬆️ increased from 40

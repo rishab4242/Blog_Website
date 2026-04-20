@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import { authMiddleware } from "./authMiddleware/authMiddleware.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import fs from "fs";
 
 dotenv.config();
 
@@ -88,7 +89,7 @@ app.post("/blogs/create", authMiddleware, upload.single("img"), (req, res) => {
   if (!req.file) {
     return res.status(400).send("No image uploaded");
   }
-  const image = req.file.filename;
+  const image = `uploads/${req.file.filename}`;
 
   const q = `INSERT INTO blogs (title, image, price, content, description, user_id) VALUES (?,?,?,?,?,?)`;
 
@@ -151,7 +152,15 @@ app.put(
         return res.status(403).json({ message: "Unauthorized" });
       }
 
-      let image = req.file ? req.file.filename : null;
+      if (result[0].image) {
+        fs.unlink(result[0].image, (err) => {
+          if (err) {
+            console.log("Image delete error:", err);
+          }
+        });
+      }
+
+      let image = req.file ? `uploads/${req.file.filename}` : null;
 
       let q1;
       let values;
@@ -187,6 +196,14 @@ app.delete("/blogs/:id/delete", authMiddleware, (req, res) => {
 
     if (result.length === 0) {
       return res.status(404).json({ message: "Not found" });
+    }
+
+    if (result[0].image) {
+      fs.unlink(result[0].image, (err) => {
+        if (err) {
+          console.log("Image delete error:", err);
+        }
+      });
     }
 
     if (result[0].user_id !== userId) {
