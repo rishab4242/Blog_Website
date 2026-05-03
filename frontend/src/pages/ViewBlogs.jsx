@@ -187,7 +187,7 @@ function ViewBlogs() {
             component="img"
             sx={{ padding: "10px" }}
             height="200"
-            image={`http://localhost:8080/${viewblog.image}`}
+            image={`${viewblog.image}`}
             alt={viewblog.title}
           />
 

@@ -4,6 +4,8 @@ import BlogCard from "../components/BlogCard";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { isTokenExpired } from "../utils/auth.js";
+import { Paper, Typography, Button, Box } from "@mui/material";
+import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 
 function AllBlogs({ setCartItems }) {
   let [blogs, setBlogs] = useState([]);
@@ -72,7 +74,48 @@ function AllBlogs({ setCartItems }) {
           ))}
         </div>
       ) : (
-        <p className="text-red-500 text-center relative top-70 ">No Blog Found!!</p>
+        <Box
+          sx={{
+            height: "80vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Paper
+            elevation={3}
+            sx={{
+              p: 5,
+              textAlign: "center",
+              maxWidth: 300,
+              borderRadius: 3,
+            }}
+          >
+            {/* Icon */}
+            <ArticleOutlinedIcon
+              sx={{ fontSize: 70, color: "#9e9e9e", mb: 1 }}
+            />
+
+            {/* Title */}
+            <Typography variant="h6" gutterBottom>
+              No Blogs Found
+            </Typography>
+
+            {/* Subtitle */}
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Start creating your first blog and it will appear here.
+            </Typography>
+
+            {/* Button */}
+            <Button
+              variant="contained"
+              onClick={() => navigate("/blogs/create")}
+              sx={{ textTransform: "none" }}
+            >
+              Create Blog
+            </Button>
+          </Paper>
+        </Box>
       )}
     </>
   );

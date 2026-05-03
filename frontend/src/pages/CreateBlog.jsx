@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import ImageUpload from "../components/ImageUpload";
 
 function CreateBlog() {
   const [blogs, setBlogs] = useState({
@@ -18,6 +19,7 @@ function CreateBlog() {
     content: "",
     description: "",
   });
+  const [preview, setPreview] = useState(null);
 
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
@@ -69,10 +71,15 @@ function CreateBlog() {
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
     setErrors((prev) => ({ ...prev, img: "" }));
+    const selectedFile = e.target.files[0];
+
+    if (selectedFile) {
+      setFile(selectedFile); // ✅ actual file
+      setPreview(URL.createObjectURL(selectedFile)); // preview
+    }
   };
 
   // 🔥 FRONTEND VALIDATION (IMPORTANT)
-  // 🔥 VALIDATION
   const validateForm = () => {
     let temp = {};
 
@@ -192,22 +199,12 @@ function CreateBlog() {
           />
 
           {/* Image */}
-          <Button variant="outlined" component="label">
-            Upload Image
-            <input
-              type="file"
-              name="img"
-              onChange={handleFileChange}
-              hidden
-              accept="image/*"
-            />
-          </Button>
-
-          {errors.img && (
-            <Typography color="error" fontSize="0.8rem">
-              {errors.img}
-            </Typography>
-          )}
+          <ImageUpload
+            file={file}
+            setFile={setFile}
+            preview={preview}
+            setPreview={setPreview}
+          />
 
           {/* Price */}
           <TextField

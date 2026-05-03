@@ -120,6 +120,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
     });
     const order = await res.json();
 
+    // verify the payement
     var options = {
       key: "rzp_test_SccIO2qO4Jepzu", // Enter the Key ID generated from the Dashboard
       amount: order.amount, // Amount is in currency subunits.
@@ -279,7 +280,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
                   {/* Image */}
                   <TableCell sx={{ py: 1.2, px: 2 }}>
                     <img
-                      src={`http://localhost:8080/${item.image}`}
+                      src={`${item.image}`}
                       alt={item.title}
                       style={{
                         width: 64, // ⬆️ increased from 40

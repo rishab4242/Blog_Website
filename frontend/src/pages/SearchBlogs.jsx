@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
@@ -42,12 +42,14 @@ function SearchBlogs() {
     <>
       {blog && blog.id ? (
         <Card sx={{ maxWidth: 345, m: 2, borderRadius: 3, boxShadow: 3 }}>
-          <CardMedia
-            component="img"
-            height="200"
-            image={`http://localhost:8080/uploads/${blog.image}`}
-            alt={blog.title}
-          />
+          <Link to={`/blogs/${blog.id}/view`}>
+            <CardMedia
+              component="img"
+              height="200"
+              image={`${blog.image}`}
+              alt={blog.title}
+            />
+          </Link>
 
           <CardContent>
             <Typography gutterBottom variant="h5" component="div">

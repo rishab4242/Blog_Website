@@ -15,6 +15,7 @@ import {
 
 import toast from "react-hot-toast";
 import { isTokenExpired } from "../utils/auth.js";
+import ImageUpload from "../components/ImageUpload";
 
 function EditBlog() {
   const [editblog, setEditblog] = useState({
@@ -23,6 +24,13 @@ function EditBlog() {
     content: "",
     description: "",
   });
+  const [preview, setPreview] = useState(null);
+
+  useEffect(() => {
+    if (editblog?.image) {
+      setPreview(editblog.image);
+    }
+  }, [editblog]);
 
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
@@ -212,28 +220,12 @@ function EditBlog() {
           />
 
           {/* Current Image */}
-          <Typography variant="subtitle1">Current Image</Typography>
-
-          {editblog.image && (
-            <Card sx={{ maxWidth: 250, borderRadius: 2 }}>
-              <CardMedia
-                component="img"
-                height="180"
-                image={`http://localhost:8080/${editblog.image}`}
-              />
-            </Card>
-          )}
-
-          {/* Upload */}
-          <Button variant="outlined" component="label">
-            Upload New Image
-            <input
-              type="file"
-              hidden
-              onChange={handleFileChange}
-              accept="image/*"
-            />
-          </Button>
+          <ImageUpload
+            file={file}
+            setFile={setFile}
+            preview={preview}
+            setPreview={setPreview}
+          />
 
           {/* Price */}
           <TextField

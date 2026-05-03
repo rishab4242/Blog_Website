@@ -2,13 +2,14 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mysql from "mysql2";
-import upload from "./config/multer.js";
+// import upload from "./config/multer.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { authMiddleware } from "./authMiddleware/authMiddleware.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import fs from "fs";
+import upload from "./middleware/upload.js";
 
 dotenv.config();
 
@@ -86,30 +87,27 @@ app.get("/blogs/search", (req, res) => {
 app.post("/blogs/create", authMiddleware, upload.single("img"), (req, res) => {
   const { title, price, content, description } = req.body;
   const user_id = req.user.id;
+
   if (!req.file) {
     return res.status(400).send("No image uploaded");
   }
-  const image = `uploads/${req.file.filename}`;
+
+  const image = req.file.path;
 
   const q = `INSERT INTO blogs (title, image, price, content, description, user_id) VALUES (?,?,?,?,?,?)`;
 
-  try {
-    connection.query(
-      q,
-      [title, image, price, content, description, user_id],
-      (err, result) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).send("Database error:", err);
-        }
+  connection.query(
+    q,
+    [title, image, price, content, description, user_id],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).send("Database error");
+      }
 
-        res.send("Blog Created Successfully");
-      },
-    );
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Server Error");
-  }
+      res.send("Blog Created Successfully");
+    },
+  );
 });
 
 app.get("/blogs/:id", authMiddleware, (req, res) => {
@@ -152,15 +150,15 @@ app.put(
         return res.status(403).json({ message: "Unauthorized" });
       }
 
-      if (result[0].image) {
-        fs.unlink(result[0].image, (err) => {
-          if (err) {
-            console.log("Image delete error:", err);
-          }
-        });
-      }
+      // if (result[0].image) {
+      //   fs.unlink(result[0].image, (err) => {
+      //     if (err) {
+      //       console.log("Image delete error:", err);
+      //     }
+      //   });
+      // }
 
-      let image = req.file ? `uploads/${req.file.filename}` : null;
+      let image = req.file ? req.file.path : null;
 
       let q1;
       let values;
