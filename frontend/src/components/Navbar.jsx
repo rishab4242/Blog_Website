@@ -59,6 +59,8 @@ export default function Navbar() {
       return;
     }
     navigate(`/blogs/search/${searchTerm}`);
+
+    setSearchTerm("");
   };
 
   // 🔥 NAV HELPERS

@@ -6,10 +6,12 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Navbar from "../components/Navbar";
+import BlogCard from "../components/BlogCard";
+import toast from "react-hot-toast";
 
-function SearchBlogs() {
+function SearchBlogs({ setCartItems }) {
   const { query } = useParams();
-  const [blog, setBlog] = useState({});
+  const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
     const fetchSearch = async () => {
@@ -24,50 +26,53 @@ function SearchBlogs() {
           },
         );
 
-        if (res.data && res.data.id) {
-          setBlog(res.data);
-        } else {
-          setBlog(null);
-        }
+        setBlogs(res.data || []);
       } catch (err) {
         console.log(err);
-        setBlog(null);
+        setBlogs(null);
       }
     };
 
     fetchSearch();
   }, [query]);
 
+  const addToCart = (blog) => {
+    setCartItems((prev) => [...prev, blog]);
+
+    toast.success("Added to cart 🛒", {
+      style: {
+        borderRadius: "10px",
+        background: "#333",
+        color: "#fff",
+      },
+    });
+  };
+
   return (
     <>
-      {blog && blog.id ? (
-        <Card sx={{ maxWidth: 345, m: 2, borderRadius: 3, boxShadow: 3 }}>
-          <Link to={`/blogs/${blog.id}/view`}>
-            <CardMedia
-              component="img"
-              height="200"
-              image={`${blog.image}`}
-              alt={blog.title}
-            />
-          </Link>
-
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="div">
-              {blog.title}
-            </Typography>
-
-            <Typography variant="body2" color="text.secondary">
-              {blog.content}
-            </Typography>
-
-            <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: "bold" }}>
-              ₹ {blog.price}
-            </Typography>
-          </CardContent>
-        </Card>
-      ) : (
-        <p>No blog found</p>
-      )}
+      <>
+        {blogs.length > 0 ? (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 300px))",
+              gap: "30px",
+              margin: "35px",
+              justifyContent: "center",
+            }}
+          >
+            {blogs.map((blog) => (
+              <div key={blog.id}>
+                <BlogCard blog={blog} addToCart={addToCart} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ textAlign: "center", marginTop: "50px" }}>
+            No blogs found
+          </p>
+        )}
+      </>
     </>
   );
 }

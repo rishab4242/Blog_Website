@@ -21,8 +21,6 @@ function App() {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
- 
-
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
@@ -32,7 +30,10 @@ function App() {
           path="/blogs"
           element={<AllBlogs setCartItems={setCartItems} />}
         />
-        <Route path="/blogs/search/:query" element={<SearchBlogs />} />
+        <Route
+          path="/blogs/search/:query"
+          element={<SearchBlogs setCartItems={setCartItems} />}
+        />
         <Route path="/blogs/create" element={<CreateBlog />} />
         <Route path="/blogs/:id" element={<EditBlog />} />
         <Route path="/blogs/:id/view" element={<ViewBlogs />} />

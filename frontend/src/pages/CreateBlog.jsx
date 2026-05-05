@@ -6,6 +6,7 @@ import {
   Typography,
   Box,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ function CreateBlog() {
     content: "",
     description: "",
   });
+  const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState(null);
 
   const [file, setFile] = useState(null);
@@ -127,6 +129,7 @@ function CreateBlog() {
     formData.append("img", file);
 
     try {
+      setLoading(true);
       const res = await axios.post(
         "http://localhost:8080/blogs/create",
         formData,
@@ -172,92 +175,131 @@ function CreateBlog() {
         localStorage.removeItem("token");
         navigate("/blogs/login");
       }
+    } finally {
+      setLoading(false); // 🔥 STOP LOADING (IMPORTANT)
     }
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ padding: 4, marginTop: 5 }}>
-        <Typography variant="h5" align="center" gutterBottom>
-          Create New Blog
-        </Typography>
-
+    <>
+      {loading && (
         <Box
-          component="form"
-          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-          onSubmit={handleSubmit}
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.25)", // lighter overlay
+            backdropFilter: "blur(2px)", // 🔥 modern glass effect
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
         >
-          {/* Title */}
-          <TextField
-            label="Blog Title"
-            name="title"
-            value={blogs.title}
-            onChange={handleChange}
-            error={!!errors.title}
-            helperText={errors.title}
-            fullWidth
-          />
-
-          {/* Image */}
-          <ImageUpload
-            file={file}
-            setFile={setFile}
-            preview={preview}
-            setPreview={setPreview}
-          />
-
-          {/* Price */}
-          <TextField
-            label="Price"
-            type="number"
-            name="price"
-            value={blogs.price}
-            onChange={handleChange}
-            error={!!errors.price}
-            helperText={errors.price}
-            fullWidth
-          />
-
-          {/* Content */}
-          <TextField
-            label="Content"
-            multiline
-            rows={4}
-            name="content"
-            value={blogs.content}
-            onChange={handleChange}
-            error={!!errors.content}
-            helperText={errors.content || "Max 255 characters allowed"}
-            inputProps={{ maxLength: 255 }}
-            fullWidth
-          />
-
-          {/* Description */}
-          <TextField
-            label="Description"
-            multiline
-            rows={3}
-            name="description"
-            value={blogs.description}
-            onChange={handleChange}
-            error={!!errors.description}
-            helperText={errors.description || "Max 255 characters allowed"}
-            inputProps={{ maxLength: 255 }}
-            fullWidth
-          />
-
-          {/* Submit */}
-          <Button
-            type="submit"
-            variant="contained"
-            size="large"
-            sx={{ textTransform: "none" }}
-          >
-            Submit Blog
-          </Button>
+          <CircularProgress size={60} sx={{ color: "#fff" }} />
+          <Typography sx={{ mt: 2, color: "#fff" }}>
+            Uploading blog...
+          </Typography>
         </Box>
-      </Paper>
-    </Container>
+      )}
+
+      <Container maxWidth="sm">
+        <Paper elevation={3} sx={{ padding: 4, marginTop: 5 }}>
+          <Typography variant="h5" align="center" gutterBottom>
+            Create New Blog
+          </Typography>
+
+          <Box
+            component="form"
+            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+            onSubmit={handleSubmit}
+          >
+            {/* Title */}
+            <TextField
+              label="Blog Title"
+              name="title"
+              value={blogs.title}
+              onChange={handleChange}
+              error={!!errors.title}
+              helperText={errors.title}
+              fullWidth
+            />
+
+            {/* Image */}
+            <ImageUpload
+              file={file}
+              setFile={setFile}
+              preview={preview}
+              setPreview={setPreview}
+            />
+
+            {/* Price */}
+            <TextField
+              label="Price"
+              type="number"
+              name="price"
+              value={blogs.price}
+              onChange={handleChange}
+              error={!!errors.price}
+              helperText={errors.price}
+              fullWidth
+            />
+
+            {/* Content */}
+            <TextField
+              label="Content"
+              multiline
+              rows={4}
+              name="content"
+              value={blogs.content}
+              onChange={handleChange}
+              error={!!errors.content}
+              helperText={errors.content || "Max 255 characters allowed"}
+              inputProps={{ maxLength: 255 }}
+              fullWidth
+            />
+
+            {/* Description */}
+            <TextField
+              label="Description"
+              multiline
+              rows={3}
+              name="description"
+              value={blogs.description}
+              onChange={handleChange}
+              error={!!errors.description}
+              helperText={errors.description || "Max 255 characters allowed"}
+              inputProps={{ maxLength: 255 }}
+              fullWidth
+            />
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              sx={{
+                textTransform: "none",
+                position: "relative",
+                overflow: "hidden",
+              }}
+              onClick={loading ? (e) => e.preventDefault() : undefined} // 🔥 block re-click
+            >
+              {loading ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <CircularProgress size={20} color="inherit" />
+                  Submitting...
+                </Box>
+              ) : (
+                "Submit Blog"
+              )}
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+    </>
   );
 }
 

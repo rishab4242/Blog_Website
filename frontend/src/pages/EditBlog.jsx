@@ -11,6 +11,7 @@ import {
   Paper,
   Card,
   CardMedia,
+  CircularProgress,
 } from "@mui/material";
 
 import toast from "react-hot-toast";
@@ -24,13 +25,15 @@ function EditBlog() {
     content: "",
     description: "",
   });
+  const [loading, setLoading] = useState(false);
+
   const [preview, setPreview] = useState(null);
 
   useEffect(() => {
     if (editblog?.image) {
       setPreview(editblog.image);
     }
-  }, [editblog]);
+  }, [editblog.image]);
 
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
@@ -152,6 +155,7 @@ function EditBlog() {
     }
 
     try {
+      setLoading(true);
       const res = await axios.put(
         `http://localhost:8080/blogs/${id}/update`,
         formData,
@@ -193,97 +197,136 @@ function EditBlog() {
           color: "#fff",
         },
       });
+    } finally {
+      setLoading(false); // 🔥 STOP LOADING (IMPORTANT)
     }
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ padding: 4, marginTop: 5 }}>
-        <Typography variant="h5" align="center" gutterBottom>
-          Edit Your Blog
-        </Typography>
-
+    <>
+      {loading && (
         <Box
-          component="form"
-          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-          onSubmit={handleEdit}
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.25)", // lighter overlay
+            backdropFilter: "blur(2px)", // 🔥 modern glass effect
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
         >
-          {/* Title */}
-          <TextField
-            label="Blog Title"
-            name="title"
-            value={editblog.title}
-            onChange={handleEditchange}
-            error={!!errors.title}
-            helperText={errors.title}
-            fullWidth
-          />
-
-          {/* Current Image */}
-          <ImageUpload
-            file={file}
-            setFile={setFile}
-            preview={preview}
-            setPreview={setPreview}
-          />
-
-          {/* Price */}
-          <TextField
-            label="Price"
-            type="number"
-            name="price"
-            value={editblog.price}
-            onChange={handleEditchange}
-            error={!!errors.price}
-            helperText={errors.price}
-            fullWidth
-          />
-
-          {/* Content */}
-          <TextField
-            label="Content"
-            multiline
-            rows={4}
-            name="content"
-            value={editblog.content}
-            onChange={handleEditchange}
-            error={!!errors.content}
-            helperText={errors.content || "Max 255 characters allowed"}
-            inputProps={{ maxLength: 255 }}
-            fullWidth
-          />
-
-          {/* Description */}
-          <TextField
-            label="Description"
-            multiline
-            rows={3}
-            name="description"
-            value={editblog.description}
-            onChange={handleEditchange}
-            error={!!errors.description}
-            helperText={errors.description || "Max 255 characters allowed"}
-            inputProps={{ maxLength: 255 }}
-            fullWidth
-          />
-
-          {/* Submit */}
-          <Button
-            type="submit"
-            variant="contained"
-            size="large"
-            disabled={
-              !editblog.title?.trim() ||
-              !editblog.price ||
-              !editblog.content?.trim() ||
-              Object.values(errors).some((err) => err)
-            }
-          >
-            Update Blog
-          </Button>
+          <CircularProgress size={60} sx={{ color: "#fff" }} />
+          <Typography sx={{ mt: 2, color: "#fff" }}>
+            Updating blog...
+          </Typography>
         </Box>
-      </Paper>
-    </Container>
+      )}
+
+      <Container maxWidth="sm">
+        <Paper elevation={3} sx={{ padding: 4, marginTop: 5 }}>
+          <Typography variant="h5" align="center" gutterBottom>
+            Edit Your Blog
+          </Typography>
+
+          <Box
+            component="form"
+            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+            onSubmit={handleEdit}
+          >
+            {/* Title */}
+            <TextField
+              label="Blog Title"
+              name="title"
+              value={editblog.title}
+              onChange={handleEditchange}
+              error={!!errors.title}
+              helperText={errors.title}
+              fullWidth
+            />
+
+            {/* Current Image */}
+            <ImageUpload
+              file={file}
+              setFile={setFile}
+              preview={preview}
+              setPreview={setPreview}
+            />
+
+            {/* Price */}
+            <TextField
+              label="Price"
+              type="number"
+              name="price"
+              value={editblog.price}
+              onChange={handleEditchange}
+              error={!!errors.price}
+              helperText={errors.price}
+              fullWidth
+            />
+
+            {/* Content */}
+            <TextField
+              label="Content"
+              multiline
+              rows={4}
+              name="content"
+              value={editblog.content}
+              onChange={handleEditchange}
+              error={!!errors.content}
+              helperText={errors.content || "Max 255 characters allowed"}
+              inputProps={{ maxLength: 255 }}
+              fullWidth
+            />
+
+            {/* Description */}
+            <TextField
+              label="Description"
+              multiline
+              rows={3}
+              name="description"
+              value={editblog.description}
+              onChange={handleEditchange}
+              error={!!errors.description}
+              helperText={errors.description || "Max 255 characters allowed"}
+              inputProps={{ maxLength: 255 }}
+              fullWidth
+            />
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={
+                loading || // 🔥 prevent re-click during API call
+                !editblog.title?.trim() ||
+                !editblog.price ||
+                !editblog.content?.trim() ||
+                Object.values(errors).some((err) => err)
+              }
+              sx={{
+                textTransform: "none",
+                position: "relative",
+              }}
+            >
+              {loading ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <CircularProgress size={20} color="inherit" />
+                  Updating...
+                </Box>
+              ) : (
+                "Update Blog"
+              )}
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+    </>
   );
 }
 
