@@ -10,6 +10,7 @@ import LoginForm from "./pages/LoginForm";
 import CartPage from "./pages/CartPage";
 import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
+import NotFound from "./components/NotFound";
 
 function App() {
   const [cartItems, setCartItems] = useState(() => {
@@ -45,6 +46,7 @@ function App() {
             <CartPage cartItems={cartItems} setCartItems={setCartItems} />
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

@@ -17,23 +17,19 @@ import {
 import toast from "react-hot-toast";
 import { isTokenExpired } from "../utils/auth.js";
 import ImageUpload from "../components/ImageUpload";
+import NotFound from "../components/NotFound.jsx";
 
 function EditBlog() {
-  const [editblog, setEditblog] = useState({
-    title: "",
-    price: "",
-    content: "",
-    description: "",
-  });
+  const [editblog, setEditblog] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [preview, setPreview] = useState(null);
 
   useEffect(() => {
     if (editblog?.image) {
-      setPreview(editblog.image);
+      setPreview(editblog?.image);
     }
-  }, [editblog.image]);
+  }, [editblog?.image]);
 
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
@@ -80,9 +76,17 @@ function EditBlog() {
           headers: { Authorization: token },
         });
 
-        setEditblog(res.data[0]);
+        const blogData = res.data?.[0]; // safe access
+
+        if (!blogData) {
+          setEditblog(null); // 👈 important
+          return;
+        }
+
+        setEditblog(blogData);
       } catch (error) {
         console.log(error);
+        setEditblog(null); // 👈 error case
       }
     };
 
@@ -202,6 +206,10 @@ function EditBlog() {
     }
   };
 
+  if (editblog === null) {
+    return <NotFound />;
+  }
+
   return (
     <>
       {loading && (
@@ -242,7 +250,7 @@ function EditBlog() {
             <TextField
               label="Blog Title"
               name="title"
-              value={editblog.title}
+              value={editblog?.title || ""}
               onChange={handleEditchange}
               error={!!errors.title}
               helperText={errors.title}
@@ -262,7 +270,7 @@ function EditBlog() {
               label="Price"
               type="number"
               name="price"
-              value={editblog.price}
+              value={editblog?.price || ""}
               onChange={handleEditchange}
               error={!!errors.price}
               helperText={errors.price}
@@ -275,7 +283,7 @@ function EditBlog() {
               multiline
               rows={4}
               name="content"
-              value={editblog.content}
+              value={editblog?.content || ""}
               onChange={handleEditchange}
               error={!!errors.content}
               helperText={errors.content || "Max 255 characters allowed"}
@@ -289,7 +297,7 @@ function EditBlog() {
               multiline
               rows={3}
               name="description"
-              value={editblog.description}
+              value={editblog?.description || ""}
               onChange={handleEditchange}
               error={!!errors.description}
               helperText={errors.description || "Max 255 characters allowed"}

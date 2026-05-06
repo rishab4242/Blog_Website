@@ -1,16 +1,21 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import BlogCard from "../components/BlogCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { isTokenExpired } from "../utils/auth.js";
 import { Paper, Typography, Button, Box } from "@mui/material";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
+import NotFound from "../components/NotFound.jsx";
 
 function AllBlogs({ setCartItems }) {
   let [blogs, setBlogs] = useState([]);
 
   const navigate = useNavigate();
+
+  const { id } = useParams();
+
+  
 
   const addToCart = (blog) => {
     setCartItems((prev) => [...prev, blog]);
