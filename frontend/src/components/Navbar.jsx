@@ -11,7 +11,11 @@ import { Link, useNavigate } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import MenuIcon from "@mui/icons-material/Menu";
+import Drawer from "@mui/material/Drawer";
+import Divider from "@mui/material/Divider";
 import toast from "react-hot-toast";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -20,10 +24,13 @@ const Search = styled("div")(({ theme }) => ({
   "&:hover": {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
-  marginRight: theme.spacing(2),
-  marginLeft: theme.spacing(3),
   width: "100%",
   maxWidth: "400px",
+
+  [theme.breakpoints.down("md")]: {
+    maxWidth: "100%",
+    marginTop: theme.spacing(1),
+  },
 }));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
@@ -48,19 +55,26 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function Navbar() {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
   const navigate = useNavigate();
 
   const isLoggedIn = !!localStorage.getItem("token");
 
   // 🔥 SEARCH
   const handleSearch = () => {
-    if (searchTerm.trim() === "") {
-      navigate("/blogs");
-      return;
-    }
-    navigate(`/blogs/search/${searchTerm}`);
+    setMobileOpen(false); // 🔥 CLOSE DRAWER FIRST
 
-    setSearchTerm("");
+    setTimeout(() => {
+      if (searchTerm.trim() === "") {
+        navigate("/blogs");
+        return;
+      }
+
+      navigate(`/blogs/search/${searchTerm}`);
+
+      setSearchTerm("");
+    }, 200);
   };
 
   // 🔥 NAV HELPERS
@@ -101,49 +115,256 @@ export default function Navbar() {
     navigate("/blogs/login");
   };
 
+  const toggleDrawer = (open) => () => {
+    setMobileOpen(open);
+  };
+
+  const mobileMenu = (
+    <Box
+      sx={{
+        width: 280,
+        height: "100%",
+        p: 2,
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        backgroundColor: "#1976d2",
+        color: "white",
+      }}
+      role="presentation"
+    >
+      {/* TOP BAR */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        {/* LOGO */}
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+          <Link
+            to="/blogs"
+            style={{ textDecoration: "none", color: "inherit" }}
+            onClick={() => setMobileOpen(false)}
+          >
+            My Blog
+          </Link>
+        </Typography>
+
+        {/* CLOSE BUTTON */}
+        <IconButton color="inherit" onClick={() => setMobileOpen(false)}>
+          <CloseIcon />
+        </IconButton>
+      </Box>
+
+      <Divider sx={{ backgroundColor: "rgba(255,255,255,0.3)" }} />
+
+      {/* SEARCH */}
+      <Search sx={{ margin: 0, maxWidth: "100%" }}>
+        <StyledInputBase
+          placeholder="Search blogs…"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+
+            if (e.target.value.trim() === "") {
+              navigate("/blogs");
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setTimeout(() => {
+                handleSearch();
+              }, 100);
+            }
+          }}
+        />
+
+        <SearchIconWrapper
+          onClick={() => {
+            setTimeout(() => {
+              handleSearch();
+            }, 100);
+          }}
+        >
+          <SearchIcon />
+        </SearchIconWrapper>
+      </Search>
+
+      {/* CART */}
+      <Button
+        variant="outlined"
+        color="inherit"
+        startIcon={
+          <Badge badgeContent={0} color="error">
+            <ShoppingCartIcon />
+          </Badge>
+        }
+        onClick={() => {
+          goCart();
+          setMobileOpen(false);
+        }}
+        fullWidth
+        sx={{
+          borderColor: "white",
+          color: "white",
+        }}
+      >
+        Cart
+      </Button>
+
+      {/* CREATE BLOG */}
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={() => {
+          handleCreateBlog();
+          setMobileOpen(false);
+        }}
+        fullWidth
+      >
+        Add New Blog
+      </Button>
+
+      {/* AUTH BUTTONS */}
+      {isLoggedIn ? (
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() => {
+            handleLogout();
+            setMobileOpen(false);
+          }}
+          fullWidth
+        >
+          Logout
+        </Button>
+      ) : (
+        <>
+          <Button
+            variant="outlined"
+            color="inherit"
+            onClick={() => {
+              goLogin();
+              setMobileOpen(false);
+            }}
+            fullWidth
+            sx={{
+              borderColor: "white",
+              color: "white",
+            }}
+          >
+            Login
+          </Button>
+
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => {
+              goSignup();
+              setMobileOpen(false);
+            }}
+            fullWidth
+          >
+            Signup
+          </Button>
+        </>
+      )}
+    </Box>
+  );
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Toolbar>
-          {/* LOGO */}
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "bold", cursor: "pointer" }}
+        <Toolbar
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+            flexWrap: { xs: "nowrap", md: "nowrap" },
+            px: { xs: 1, md: 2 },
+          }}
+        >
+          {/* LEFT SECTION */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              flex: 1,
+              minWidth: 0,
+            }}
           >
-            <Link
-              to="/blogs"
-              style={{ textDecoration: "none", color: "inherit" }}
+            {/* LOGO */}
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: "bold",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
             >
-              My Blog
-            </Link>
-          </Typography>
+              <Link
+                to="/blogs"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                My Blog
+              </Link>
+            </Typography>
 
-          {/* SEARCH */}
-          <Search>
-            <StyledInputBase
-              placeholder="Search blogs…"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-
-                if (e.target.value.trim() === "") {
-                  navigate("/blogs");
-                }
+            {/* MOBILE MENU BUTTON */}
+            <IconButton
+              color="inherit"
+              sx={{
+                display: { xs: "flex", md: "none" },
+                ml: "auto",
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSearch();
+              onClick={toggleDrawer(true)}
+            >
+              <MenuIcon />
+            </IconButton>
+
+            {/* SEARCH DESKTOP/TABLET */}
+            <Box
+              sx={{
+                display: { xs: "none", md: "block" },
+                flex: 1,
+                maxWidth: "400px",
               }}
-            />
+            >
+              <Search>
+                <StyledInputBase
+                  placeholder="Search blogs…"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
 
-            <SearchIconWrapper onClick={handleSearch}>
-              <SearchIcon />
-            </SearchIconWrapper>
-          </Search>
+                    if (e.target.value.trim() === "") {
+                      navigate("/blogs");
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSearch();
+                  }}
+                />
 
-          <Box sx={{ flexGrow: 1 }} />
+                <SearchIconWrapper onClick={handleSearch}>
+                  <SearchIcon />
+                </SearchIconWrapper>
+              </Search>
+            </Box>
+          </Box>
 
-          {/* ACTIONS */}
-          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          {/* DESKTOP ACTIONS */}
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              gap: 2,
+              alignItems: "center",
+            }}
+          >
             {/* CART */}
             <IconButton color="inherit" onClick={goCart}>
               <Badge badgeContent={0} color="error">
@@ -179,6 +400,11 @@ export default function Navbar() {
           </Box>
         </Toolbar>
       </AppBar>
+
+      {/* MOBILE DRAWER */}
+      <Drawer anchor="left" open={mobileOpen} onClose={toggleDrawer(false)}>
+        {mobileMenu}
+      </Drawer>
     </Box>
   );
 }

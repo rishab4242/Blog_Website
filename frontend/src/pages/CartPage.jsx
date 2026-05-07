@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -17,8 +17,15 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import toast from "react-hot-toast";
+import Collapse from "@mui/material/Collapse";
+import RemoveIconExpand from "@mui/icons-material/Remove";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 
 const CartPage = ({ cartItems, setCartItems }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [openRows, setOpenRows] = useState({});
   const handleRemove = (id) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
     toast.error("Item removed", {
@@ -106,7 +113,10 @@ const CartPage = ({ cartItems, setCartItems }) => {
   const receiptId = "qwsaq1";
 
   const payementHandler = async (e) => {
-    const totalAmount = cartItems.reduce((acc, item) => acc + item.price, 0);
+    const totalAmount = cartItems.reduce(
+      (acc, item) => acc + Number(item.price) * (item.qty || 1),
+      0,
+    );
     const res = await fetch("http://localhost:8080/order", {
       method: "POST",
       body: JSON.stringify({
@@ -224,13 +234,13 @@ const CartPage = ({ cartItems, setCartItems }) => {
         <Table size="medium">
           <TableHead>
             <TableRow sx={{ backgroundColor: "#f9f9f9" }}>
-              {["Action", "Product", "Name", "Price", "Qty"].map((h) => (
+              {["Action", "Product", "Name"].map((h) => (
                 <TableCell
                   key={h}
                   sx={{
-                    fontSize: 14, // ⬆️ increased from 12
+                    fontSize: 14,
                     fontWeight: 700,
-                    py: 1.5, // ⬆️ more padding
+                    py: 1.5,
                     px: 2,
                     borderBottom: "1px solid #e8e8e8",
                   }}
@@ -238,113 +248,293 @@ const CartPage = ({ cartItems, setCartItems }) => {
                   {h}
                 </TableCell>
               ))}
-              <TableCell
-                align="right"
-                sx={{
-                  fontSize: 14, // ⬆️ increased from 12
-                  fontWeight: 700,
-                  py: 1.5,
-                  px: 2,
-                  borderBottom: "1px solid #e8e8e8",
-                }}
-              >
-                Total Amount
-              </TableCell>
+
+              {/* ✅ MORE COLUMN RIGHT AFTER NAME */}
+              {isMobile && (
+                <TableCell
+                  align="right"
+                  sx={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                  }}
+                >
+                  More
+                </TableCell>
+              )}
+
+              {!isMobile && (
+                <>
+                  {["Price", "Qty"].map((h) => (
+                    <TableCell
+                      key={h}
+                      sx={{
+                        fontSize: 14,
+                        fontWeight: 700,
+                        py: 1.5,
+                        px: 2,
+                        borderBottom: "1px solid #e8e8e8",
+                      }}
+                    >
+                      {h}
+                    </TableCell>
+                  ))}
+
+                  <TableCell
+                    align="right"
+                    sx={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      py: 1.5,
+                      px: 2,
+                    }}
+                  >
+                    Total Amount
+                  </TableCell>
+                </>
+              )}
             </TableRow>
           </TableHead>
 
           <TableBody>
             {cartItems.map((item) => {
               const qty = item.qty || 1;
+
               return (
-                <TableRow
-                  key={item.id}
-                  sx={{ "&:last-child td": { borderBottom: 0 } }}
-                >
-                  {/* Delete */}
-                  <TableCell sx={{ py: 1.2, px: 2 }}>
-                    <IconButton
-                      onClick={() => handleRemove(item.id)}
+                <React.Fragment key={item.id}>
+                  <TableRow sx={{ "&:last-child td": { borderBottom: 0 } }}>
+                    {/* DELETE */}
+                    <TableCell sx={{ py: 1.2, px: 2 }}>
+                      <IconButton
+                        onClick={() => handleRemove(item.id)}
+                        sx={{
+                          backgroundColor: "#fde8e8",
+                          borderRadius: 1.5,
+                          width: 38,
+                          height: 38,
+                          "&:hover": { backgroundColor: "#f8d0d0" },
+                        }}
+                      >
+                        <DeleteIcon sx={{ fontSize: 20, color: "#c0392b" }} />
+                      </IconButton>
+                    </TableCell>
+
+                    {/* IMAGE */}
+                    <TableCell sx={{ py: 1.2, px: 2 }}>
+                      <img
+                        src={`${item.image}`}
+                        alt={item.title}
+                        style={{
+                          width: 64,
+                          height: 64,
+                          borderRadius: 8,
+                          display: "block",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </TableCell>
+
+                    {/* NAME */}
+                    <TableCell
                       sx={{
-                        backgroundColor: "#fde8e8",
-                        borderRadius: 1.5,
-                        width: 38, // ⬆️ increased from 30
-                        height: 38, // ⬆️ increased from 30
-                        "&:hover": { backgroundColor: "#f8d0d0" },
+                        fontSize: 14,
+                        py: 1.2,
+                        px: 2,
+                        maxWidth: isMobile ? 120 : "auto",
                       }}
                     >
-                      <DeleteIcon sx={{ fontSize: 20, color: "#c0392b" }} />
-                    </IconButton>
-                  </TableCell>
+                      {item.title}
+                    </TableCell>
 
-                  {/* Image */}
-                  <TableCell sx={{ py: 1.2, px: 2 }}>
-                    <img
-                      src={`${item.image}`}
-                      alt={item.title}
-                      style={{
-                        width: 64, // ⬆️ increased from 40
-                        height: 64, // ⬆️ increased from 40
-                        borderRadius: 8,
-                        display: "block",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </TableCell>
+                    {/* ✅ MORE COLUMN (MOBILE ONLY) */}
+                    {isMobile && (
+                      <TableCell align="right">
+                        <IconButton
+                          onClick={() =>
+                            setOpenRows((prev) => ({
+                              ...prev,
+                              [item.id]: !prev[item.id],
+                            }))
+                          }
+                          sx={{
+                            backgroundColor: "#eef2ff",
+                            width: 34,
+                            height: 34,
+                            borderRadius: 2,
+                          }}
+                        >
+                          {openRows[item.id] ? (
+                            <RemoveIcon
+                              sx={{ fontSize: 20, color: "#1e40af" }}
+                            />
+                          ) : (
+                            <AddIcon sx={{ fontSize: 20, color: "#1e40af" }} />
+                          )}
+                        </IconButton>
+                      </TableCell>
+                    )}
 
-                  {/* Name */}
-                  <TableCell sx={{ fontSize: 14, py: 1.2, px: 2 }}>
-                    {item.title}
-                  </TableCell>
+                    {/* DESKTOP ONLY */}
+                    {!isMobile && (
+                      <>
+                        {/* PRICE */}
+                        <TableCell sx={{ fontSize: 14, py: 1.2, px: 2 }}>
+                          ₹ {item.price}
+                        </TableCell>
 
-                  {/* Price */}
-                  <TableCell sx={{ fontSize: 14, py: 1.2, px: 2 }}>
-                    ₹ {item.price}
-                  </TableCell>
+                        {/* QTY */}
+                        <TableCell sx={{ py: 1.2, px: 2 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <IconButton
+                              onClick={() => handleDecrease(item.id)}
+                              sx={{
+                                backgroundColor: "#dbeafe",
+                                borderRadius: 1.5,
+                                width: 32,
+                                height: 32,
+                                "&:hover": { backgroundColor: "#bfdbfe" },
+                              }}
+                            >
+                              <RemoveIcon
+                                sx={{
+                                  fontSize: 16,
+                                  color: "#1e40af",
+                                }}
+                              />
+                            </IconButton>
 
-                  {/* Qty */}
-                  <TableCell sx={{ py: 1.2, px: 2 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <IconButton
-                        onClick={() => handleDecrease(item.id)}
+                            <Typography
+                              sx={{
+                                minWidth: 24,
+                                textAlign: "center",
+                                fontSize: 14,
+                              }}
+                            >
+                              {qty}
+                            </Typography>
+
+                            <IconButton
+                              onClick={() => handleIncrease(item.id)}
+                              sx={{
+                                backgroundColor: "#dbeafe",
+                                borderRadius: 1.5,
+                                width: 32,
+                                height: 32,
+                                "&:hover": { backgroundColor: "#bfdbfe" },
+                              }}
+                            >
+                              <AddIcon
+                                sx={{
+                                  fontSize: 16,
+                                  color: "#1e40af",
+                                }}
+                              />
+                            </IconButton>
+                          </Box>
+                        </TableCell>
+
+                        {/* TOTAL */}
+                        <TableCell
+                          align="right"
+                          sx={{ fontSize: 14, py: 1.2, px: 2 }}
+                        >
+                          ₹ {Number(item.price) * qty}
+                        </TableCell>
+                      </>
+                    )}
+                  </TableRow>
+
+                  {/* MOBILE DROPDOWN */}
+                  {isMobile && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
                         sx={{
-                          backgroundColor: "#dbeafe",
-                          borderRadius: 1.5,
-                          width: 32, // ⬆️ increased from 26
-                          height: 32, // ⬆️ increased from 26
-                          "&:hover": { backgroundColor: "#bfdbfe" },
+                          py: 0,
+                          borderBottom: 0,
                         }}
                       >
-                        <RemoveIcon sx={{ fontSize: 16, color: "#1e40af" }} />
-                      </IconButton>
-                      <Typography
-                        sx={{ minWidth: 24, textAlign: "center", fontSize: 14 }}
-                      >
-                        {qty}
-                      </Typography>
-                      <IconButton
-                        onClick={() => handleIncrease(item.id)}
-                        sx={{
-                          backgroundColor: "#dbeafe",
-                          borderRadius: 1.5,
-                          width: 32, // ⬆️ increased from 26
-                          height: 32, // ⬆️ increased from 26
-                          "&:hover": { backgroundColor: "#bfdbfe" },
-                        }}
-                      >
-                        <AddIcon sx={{ fontSize: 16, color: "#1e40af" }} />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
+                        <Collapse
+                          in={openRows[item.id]}
+                          timeout="auto"
+                          unmountOnExit
+                        >
+                          <Box
+                            sx={{
+                              p: 2,
+                              backgroundColor: "#f9fafb",
+                              borderRadius: 2,
+                              mb: 2,
+                            }}
+                          >
+                            {/* PRICE */}
+                            <Typography sx={{ mb: 1 }}>
+                              <b>Price:</b> ₹ {item.price}
+                            </Typography>
 
-                  {/* Total */}
-                  <TableCell
-                    align="right"
-                    sx={{ fontSize: 14, py: 1.2, px: 2 }}
-                  >
-                    ₹ {Number(item.price) * qty}
-                  </TableCell>
-                </TableRow>
+                            {/* QUANTITY */}
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                                mb: 1,
+                              }}
+                            >
+                              <Typography>
+                                <b>Qty:</b>
+                              </Typography>
+
+                              <IconButton
+                                onClick={() => handleDecrease(item.id)}
+                                sx={{
+                                  backgroundColor: "#dbeafe",
+                                  width: 30,
+                                  height: 30,
+                                }}
+                              >
+                                <RemoveIcon
+                                  sx={{
+                                    fontSize: 16,
+                                    color: "#1e40af",
+                                  }}
+                                />
+                              </IconButton>
+
+                              <Typography>{qty}</Typography>
+
+                              <IconButton
+                                onClick={() => handleIncrease(item.id)}
+                                sx={{
+                                  backgroundColor: "#dbeafe",
+                                  width: 30,
+                                  height: 30,
+                                }}
+                              >
+                                <AddIcon
+                                  sx={{
+                                    fontSize: 16,
+                                    color: "#1e40af",
+                                  }}
+                                />
+                              </IconButton>
+                            </Box>
+
+                            {/* TOTAL */}
+                            <Typography>
+                              <b>Total:</b> ₹ {Number(item.price) * qty}
+                            </Typography>
+                          </Box>
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               );
             })}
           </TableBody>

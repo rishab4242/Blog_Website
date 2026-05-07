@@ -15,8 +15,6 @@ function AllBlogs({ setCartItems }) {
 
   const { id } = useParams();
 
-  
-
   const addToCart = (blog) => {
     setCartItems((prev) => [...prev, blog]);
 

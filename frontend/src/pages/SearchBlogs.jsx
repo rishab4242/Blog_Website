@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import Navbar from "../components/Navbar";
 import BlogCard from "../components/BlogCard";
 import toast from "react-hot-toast";
+import NoBlogsFound from "../components/NoBlogsFound";
 
 function SearchBlogs({ setCartItems }) {
   const { query } = useParams();
@@ -29,7 +30,7 @@ function SearchBlogs({ setCartItems }) {
         setBlogs(res.data || []);
       } catch (err) {
         console.log(err);
-        setBlogs(null);
+        setBlogs([]);
       }
     };
 
@@ -51,7 +52,7 @@ function SearchBlogs({ setCartItems }) {
   return (
     <>
       <>
-        {blogs.length > 0 ? (
+        {Array.isArray(blogs) && blogs.length > 0 ? (
           <div
             style={{
               display: "grid",
@@ -68,9 +69,7 @@ function SearchBlogs({ setCartItems }) {
             ))}
           </div>
         ) : (
-          <p style={{ textAlign: "center", marginTop: "50px" }}>
-            No blogs found
-          </p>
+          <NoBlogsFound />
         )}
       </>
     </>
