@@ -66,7 +66,7 @@ function AllBlogs({ setCartItems }) {
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 300px))",
             gap: "30px",
-            margin: "35px",
+            margin: "30px",
             justifyContent: "center",
           }}
         >

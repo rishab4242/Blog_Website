@@ -28,12 +28,14 @@ const BlogCard = ({ blog, addToCart }) => {
   return (
     <Card
       sx={{
-        width: 320,
-        maxWidth: "300px",
+        width: "100%",
+        maxWidth: 320,
         borderRadius: 3,
         boxShadow: "0 2px 12px rgba(0,0,0,0.10)",
         transition: "0.3s",
         overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
         "&:hover": {
           transform: "scale(1.03)",
           boxShadow: 8,
@@ -44,9 +46,13 @@ const BlogCard = ({ blog, addToCart }) => {
       <Link to={`/blogs/${blog.id}/view`}>
         <CardMedia
           component="img"
-          image={`${blog.image}`}
+          image={blog.image}
           alt={blog.title}
-          sx={{ height: 160, objectFit: "cover", padding: "15px" }}
+          sx={{
+            height: 160,
+            width: "100%",
+            objectFit: "cover",
+          }}
         />
       </Link>
 

@@ -298,7 +298,7 @@ export default function Navbar() {
           >
             {/* LOGO */}
             <Typography
-              variant="h6"
+              variant="h4"
               sx={{
                 fontWeight: "bold",
                 cursor: "pointer",
@@ -310,7 +310,7 @@ export default function Navbar() {
                 to="/blogs"
                 style={{ textDecoration: "none", color: "inherit" }}
               >
-                My Blog
+                ɌĐ
               </Link>
             </Typography>
 
