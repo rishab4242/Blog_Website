@@ -9,6 +9,9 @@ import Navbar from "../components/Navbar";
 import BlogCard from "../components/BlogCard";
 import toast from "react-hot-toast";
 import NoBlogsFound from "../components/NoBlogsFound";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 function SearchBlogs({ setCartItems }) {
   const { query } = useParams();

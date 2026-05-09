@@ -18,6 +18,9 @@ import toast from "react-hot-toast";
 import { isTokenExpired } from "../utils/auth.js";
 import ImageUpload from "../components/ImageUpload";
 import NotFound from "../components/NotFound.jsx";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 function EditBlog() {
   const [editblog, setEditblog] = useState(null);

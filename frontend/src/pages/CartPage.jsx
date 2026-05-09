@@ -21,6 +21,9 @@ import Collapse from "@mui/material/Collapse";
 import RemoveIconExpand from "@mui/icons-material/Remove";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const CartPage = ({ cartItems, setCartItems }) => {
   const theme = useTheme();

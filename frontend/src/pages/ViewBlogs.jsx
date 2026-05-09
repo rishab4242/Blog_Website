@@ -11,6 +11,9 @@ import Ratings from "../components/Ratings";
 import { Box, Rating, Stack, Paper } from "@mui/material";
 import toast from "react-hot-toast";
 import { isTokenExpired } from "../utils/auth.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 function ViewBlogs() {
   let [viewblog, setViewblog] = useState(null);

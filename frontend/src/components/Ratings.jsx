@@ -2,6 +2,9 @@ import * as React from "react";
 import { Box, Rating, Typography, TextField, Button } from "@mui/material";
 import axios from "axios";
 import toast from "react-hot-toast";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 function Ratings({ blogId, refreshRatings }) {
   const [value, setValue] = React.useState(0);
