@@ -134,7 +134,7 @@ function CreateBlog() {
     try {
       setLoading(true);
       const res = await axios.post(
-        `${process.env.VITE_API_URL}/blogs/create`,
+        `${import.meta.env.VITE_API_URL}/blogs/create`,
         formData,
         {
           headers: {

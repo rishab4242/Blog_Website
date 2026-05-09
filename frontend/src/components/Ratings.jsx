@@ -30,7 +30,7 @@ function Ratings({ blogId, refreshRatings }) {
 
     try {
       let res = await axios.post(
-        `${process.env.VITE_API_URL}/blogs/${blogId}/rating`,
+        `${import.meta.env.VITE_API_URL}/blogs/${blogId}/rating`,
         {
           rating: value,
           description: desc,

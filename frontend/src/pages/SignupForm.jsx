@@ -81,7 +81,7 @@ export default function SignupForm() {
 
     try {
       let res = await axios.post(
-        `${process.env.VITE_API_URL}/blogs/signup`,
+        `${import.meta.env.VITE_API_URL}/blogs/signup`,
         formData,
       );
 

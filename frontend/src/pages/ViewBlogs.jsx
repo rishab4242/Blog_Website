@@ -35,7 +35,7 @@ function ViewBlogs() {
 
       try {
         let res = await axios.get(
-          `${process.env.VITE_API_URL}/blogs/${id}/view`,
+          `${import.meta.env.VITE_API_URL}/blogs/${id}/view`,
           {
             headers: { Authorization: token },
           },
@@ -63,7 +63,7 @@ function ViewBlogs() {
 
     try {
       let res = await axios.get(
-        `${process.env.VITE_API_URL}/blogs/${id}/rating`,
+        `${import.meta.env.VITE_API_URL}/blogs/${id}/rating`,
         {
           headers: {
             Authorization: token,
@@ -82,7 +82,7 @@ function ViewBlogs() {
       const token = localStorage.getItem("token");
       try {
         let res = await axios.get(
-          `${process.env.VITE_API_URL}/blogs/${id}/rating`,
+          `${import.meta.env.VITE_API_URL}/blogs/${id}/rating`,
           {
             headers: {
               Authorization: token,
@@ -124,7 +124,7 @@ function ViewBlogs() {
 
     try {
       let res = await axios.delete(
-        `${process.env.VITE_API_URL}/blogs/${id}/delete`,
+        `${import.meta.env.VITE_API_URL}/blogs/${id}/delete`,
         {
           headers: { Authorization: token },
         },
@@ -163,7 +163,7 @@ function ViewBlogs() {
 
     try {
       let res = await axios.delete(
-        `${process.env.VITE_API_URL}/blogs/${ratingId}/rating/delete`,
+        `${import.meta.env.VITE_API_URL}/blogs/${ratingId}/rating/delete`,
         {
           headers: {
             Authorization: token,

@@ -120,7 +120,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
       (acc, item) => acc + Number(item.price) * (item.qty || 1),
       0,
     );
-    const res = await fetch(`${process.env.VITE_API_URL}/order`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/order`, {
       method: "POST",
       body: JSON.stringify({
         amount: totalAmount * 100, // bcoz amount will be in razorpay like Subunits(paisa) *100 = in Rs
@@ -148,7 +148,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
         };
 
         const validateRes = await fetch(
-          "${process.env.VITE_API_URL}/order/validate",
+          "${import.meta.env.VITE_API_URL}/order/validate",
           {
             method: "POST",
             body: JSON.stringify(body),

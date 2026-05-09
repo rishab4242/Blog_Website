@@ -77,7 +77,7 @@ export default function LoginForm() {
 
     try {
       let res = await axios.post(
-        `${process.env.VITE_API_URL}/blogs/login`,
+        `${import.meta.env.VITE_API_URL}/blogs/login`,
         formData,
       );
 

@@ -22,7 +22,7 @@ function SearchBlogs({ setCartItems }) {
       const token = localStorage.getItem("token");
       try {
         let res = await axios.get(
-          `${process.env.VITE_API_URL}/blogs/search?title=${query}`,
+          `${import.meta.env.VITE_API_URL}/blogs/search?title=${query}`,
           {
             headers: {
               Authorization: token,

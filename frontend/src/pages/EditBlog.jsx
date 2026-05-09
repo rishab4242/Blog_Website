@@ -75,9 +75,12 @@ function EditBlog() {
       }
 
       try {
-        const res = await axios.get(`${process.env.VITE_API_URL}/blogs/${id}`, {
-          headers: { Authorization: token },
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/blogs/${id}`,
+          {
+            headers: { Authorization: token },
+          },
+        );
 
         const blogData = res.data?.[0]; // safe access
 
@@ -164,7 +167,7 @@ function EditBlog() {
     try {
       setLoading(true);
       const res = await axios.put(
-        `${process.env.VITE_API_URL}/blogs/${id}/update`,
+        `${import.meta.env.VITE_API_URL}/blogs/${id}/update`,
         formData,
         {
           headers: {
