@@ -27,7 +27,7 @@ function Ratings({ blogId, refreshRatings }) {
 
     try {
       let res = await axios.post(
-        `http://localhost:8080/blogs/${blogId}/rating`,
+        `${process.env.VITE_API_URL}/blogs/${blogId}/rating`,
         {
           rating: value,
           description: desc,

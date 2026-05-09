@@ -72,7 +72,7 @@ function EditBlog() {
       }
 
       try {
-        const res = await axios.get(`http://localhost:8080/blogs/${id}`, {
+        const res = await axios.get(`${process.env.VITE_API_URL}/blogs/${id}`, {
           headers: { Authorization: token },
         });
 
@@ -161,7 +161,7 @@ function EditBlog() {
     try {
       setLoading(true);
       const res = await axios.put(
-        `http://localhost:8080/blogs/${id}/update`,
+        `${process.env.VITE_API_URL}/blogs/${id}/update`,
         formData,
         {
           headers: {

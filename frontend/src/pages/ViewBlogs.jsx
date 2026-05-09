@@ -31,9 +31,12 @@ function ViewBlogs() {
       }
 
       try {
-        let res = await axios.get(`http://localhost:8080/blogs/${id}/view`, {
-          headers: { Authorization: token },
-        });
+        let res = await axios.get(
+          `${process.env.VITE_API_URL}/blogs/${id}/view`,
+          {
+            headers: { Authorization: token },
+          },
+        );
 
         setViewblog(res.data);
       } catch (error) {
@@ -56,11 +59,14 @@ function ViewBlogs() {
     const token = localStorage.getItem("token");
 
     try {
-      let res = await axios.get(`http://localhost:8080/blogs/${id}/rating`, {
-        headers: {
-          Authorization: token,
+      let res = await axios.get(
+        `${process.env.VITE_API_URL}/blogs/${id}/rating`,
+        {
+          headers: {
+            Authorization: token,
+          },
         },
-      });
+      );
       setRatings(res.data);
     } catch (error) {
       console.log(error);
@@ -72,11 +78,14 @@ function ViewBlogs() {
     const fetchViewBlogRatings = async () => {
       const token = localStorage.getItem("token");
       try {
-        let res = await axios.get(`http://localhost:8080/blogs/${id}/rating`, {
-          headers: {
-            Authorization: token,
+        let res = await axios.get(
+          `${process.env.VITE_API_URL}/blogs/${id}/rating`,
+          {
+            headers: {
+              Authorization: token,
+            },
           },
-        });
+        );
 
         setRatings(res.data);
       } catch (error) {
@@ -111,9 +120,12 @@ function ViewBlogs() {
     if (!confirmAction) return;
 
     try {
-      let res = await axios.delete(`http://localhost:8080/blogs/${id}/delete`, {
-        headers: { Authorization: token },
-      });
+      let res = await axios.delete(
+        `${process.env.VITE_API_URL}/blogs/${id}/delete`,
+        {
+          headers: { Authorization: token },
+        },
+      );
 
       toast.success(res.data.message || "Blog deleted", {
         style: {
@@ -148,7 +160,7 @@ function ViewBlogs() {
 
     try {
       let res = await axios.delete(
-        `http://localhost:8080/blogs/${ratingId}/rating/delete`,
+        `${process.env.VITE_API_URL}/blogs/${ratingId}/rating/delete`,
         {
           headers: {
             Authorization: token,

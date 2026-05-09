@@ -78,7 +78,7 @@ export default function SignupForm() {
 
     try {
       let res = await axios.post(
-        "http://localhost:8080/blogs/signup",
+        `${process.env.VITE_API_URL}/blogs/signup`,
         formData,
       );
 

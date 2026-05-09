@@ -73,7 +73,10 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      let res = await axios.post("http://localhost:8080/blogs/login", formData);
+      let res = await axios.post(
+        `${process.env.VITE_API_URL}/blogs/login`,
+        formData,
+      );
 
       // save token
       localStorage.setItem("token", res.data.token);

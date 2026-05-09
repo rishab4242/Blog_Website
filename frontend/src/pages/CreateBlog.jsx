@@ -131,7 +131,7 @@ function CreateBlog() {
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:8080/blogs/create",
+        `${process.env.VITE_API_URL}/blogs/create`,
         formData,
         {
           headers: {
