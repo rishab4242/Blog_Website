@@ -12,9 +12,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import ImageUpload from "../components/ImageUpload";
-import dotenv from "dotenv";
 
-dotenv.config();
 
 function CreateBlog() {
   const [blogs, setBlogs] = useState({

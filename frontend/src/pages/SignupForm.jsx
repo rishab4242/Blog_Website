@@ -10,9 +10,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import dotenv from "dotenv";
 
-dotenv.config();
 
 export default function SignupForm() {
   const [formData, setFormData] = React.useState({
