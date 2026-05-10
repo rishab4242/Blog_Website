@@ -143,7 +143,7 @@ export default function SignupForm() {
           elevation={6}
           sx={{
             padding: 4,
-            marginTop: 8,
+            marginTop: 4,
             borderRadius: 3,
           }}
         >
