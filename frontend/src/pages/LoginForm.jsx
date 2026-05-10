@@ -137,18 +137,20 @@ export default function LoginForm() {
       )}
       <Container
         maxWidth="sm"
+        disableGutters
         sx={{
           minHeight: "100vh",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          padding: 0,
         }}
       >
         <Paper
           elevation={6}
           sx={{
             padding: 4,
-            marginTop: 8,
+            width: "100%",
             borderRadius: 3,
           }}
         >

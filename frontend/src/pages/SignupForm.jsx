@@ -140,18 +140,21 @@ export default function SignupForm() {
       )}
       <Container
         maxWidth="sm"
+        maxWidth="sm"
+        disableGutters
         sx={{
           minHeight: "100vh",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          padding: 0,
         }}
       >
         <Paper
           elevation={6}
           sx={{
             padding: 4,
-            width: "100%", 
+            width: "100%",
             borderRadius: 3,
           }}
         >
