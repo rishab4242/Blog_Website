@@ -138,7 +138,15 @@ export default function SignupForm() {
           <Typography sx={{ mt: 2, color: "#fff" }}>Please Wait...</Typography>
         </Box>
       )}
-      <Container maxWidth="sm">
+      <Container
+        maxWidth="sm"
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <Paper
           elevation={6}
           sx={{
