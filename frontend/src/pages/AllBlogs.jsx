@@ -8,7 +8,6 @@ import { Paper, Typography, Button, Box } from "@mui/material";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import NotFound from "../components/NotFound.jsx";
 
-
 function AllBlogs({ setCartItems }) {
   let [blogs, setBlogs] = useState([]);
 
