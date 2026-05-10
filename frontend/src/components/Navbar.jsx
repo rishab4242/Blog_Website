@@ -86,7 +86,7 @@ export default function Navbar() {
 
       setSearchTerm("");
 
-      navigate(`/blogs/search/${term}`);
+      navigate(`/blogs/search/${searchTerm}`);
     }, 200);
   };
 
