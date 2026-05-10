@@ -72,6 +72,7 @@ export default function Navbar() {
           color: "#fff",
         },
       });
+      setSearchTerm("");
 
       navigate("/blogs/login");
       return;
@@ -83,9 +84,9 @@ export default function Navbar() {
         return;
       }
 
-      navigate(`/blogs/search/${searchTerm}`);
-
       setSearchTerm("");
+
+      navigate(`/blogs/search/${term}`);
     }, 200);
   };
 
