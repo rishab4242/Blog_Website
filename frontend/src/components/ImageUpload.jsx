@@ -1,7 +1,7 @@
 import { useDropzone } from "react-dropzone";
 import { Box, Typography, Button } from "@mui/material";
 
-const ImageUpload = ({ file, setFile, preview, setPreview }) => {
+const ImageUpload = ({ file, setFile, preview, setPreview, error,setErrors, }) => {
   const onDrop = (acceptedFiles) => {
     const selectedFile = acceptedFiles[0];
 
@@ -20,6 +20,7 @@ const ImageUpload = ({ file, setFile, preview, setPreview }) => {
     e.stopPropagation();
     setFile(null);
     setPreview(null);
+    setErrors((prev) => ({ ...prev, image: "" }));
   };
 
   return (
@@ -96,6 +97,14 @@ const ImageUpload = ({ file, setFile, preview, setPreview }) => {
           </Box>
         )}
       </Box>
+      {error && (
+        <Typography
+          variant="caption"
+          sx={{ color: "red", mt: 1, display: "block" }}
+        >
+          {error}
+        </Typography>
+      )}
     </Box>
   );
 };

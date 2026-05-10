@@ -19,7 +19,6 @@ import { isTokenExpired } from "../utils/auth.js";
 import ImageUpload from "../components/ImageUpload";
 import NotFound from "../components/NotFound.jsx";
 
-
 function EditBlog() {
   const [editblog, setEditblog] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -139,6 +138,8 @@ function EditBlog() {
   const handleEdit = async (e) => {
     e.preventDefault();
 
+    let newErrors = {};
+
     const token = localStorage.getItem("token");
 
     if (!validateForm()) {
@@ -161,6 +162,23 @@ function EditBlog() {
     if (file) {
       formData.append("img", file);
     }
+
+    // 🔥 IMAGE VALIDATION (IMPORTANT)
+    if (!file && !preview) {
+      newErrors.image = "Image is required";
+      toast.error("Please Upload Image!", {
+        position: "top-center",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
 
     try {
       setLoading(true);
@@ -267,6 +285,8 @@ function EditBlog() {
               setFile={setFile}
               preview={preview}
               setPreview={setPreview}
+              error={errors.image}
+              setErrors={setErrors}
             />
 
             {/* Price */}
