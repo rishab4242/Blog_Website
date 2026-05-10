@@ -64,6 +64,18 @@ export default function Navbar() {
   // 🔥 SEARCH
   const handleSearch = () => {
     setMobileOpen(false); // 🔥 CLOSE DRAWER FIRST
+    if (!isLoggedIn) {
+      toast.error("Please login first 🔐", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+
+      navigate("/blogs/login");
+      return;
+    }
 
     setTimeout(() => {
       if (searchTerm.trim() === "") {

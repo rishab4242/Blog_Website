@@ -15,6 +15,8 @@ function SearchBlogs({ setCartItems }) {
   const { query } = useParams();
   const [blogs, setBlogs] = useState([]);
 
+  
+
   useEffect(() => {
     const fetchSearch = async () => {
       const token = localStorage.getItem("token");
