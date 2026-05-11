@@ -167,7 +167,7 @@ const BlogCard = ({ blog, addToCart }) => {
           onClick={() => addToCart(blog)}
           sx={{
             width: {
-              xs: "60%", // full width on mobile
+              xs: "50%", // full width on mobile
               sm: "140px",
               md: "130px",
             },
