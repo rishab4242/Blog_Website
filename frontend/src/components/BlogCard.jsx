@@ -166,20 +166,64 @@ const BlogCard = ({ blog, addToCart }) => {
           variant="contained"
           onClick={() => addToCart(blog)}
           sx={{
-            width: "130px",
-            mx: 1.5,
-            borderRadius: "24px",
+            width: {
+              xs: "60%", // full width on mobile
+              sm: "140px",
+              md: "130px",
+            },
+
+            mx: {
+              xs: 0,
+              sm: 1.5,
+            },
+
+            mt: {
+              xs: 0,
+              sm: 0,
+            },
+
+            borderRadius: {
+              xs: "18px",
+              sm: "24px",
+            },
+
             bgcolor: "#ff6b6b",
             color: "#fff",
+
             fontWeight: "bold",
-            fontSize: "0.95rem",
+
+            fontSize: {
+              xs: "1rem",
+              sm: "1rem",
+              md: "0.95rem",
+            },
+
             textTransform: "none",
+
             boxShadow: "none",
-            py: 0.9,
-            "&:hover": { bgcolor: "#e55a5a", boxShadow: "none" },
+
+            py: {
+              xs: 0,
+              sm: 0,
+            },
+
+            px: {
+              xs: 1.5,
+              sm: 2,
+            },
+
+            minHeight: {
+              xs: "40px",
+              sm: "42px",
+            },
+
+            "&:hover": {
+              bgcolor: "#e55a5a",
+              boxShadow: "none",
+            },
           }}
         >
-          Add TO Cart
+          Add To Cart
         </Button>
 
         {/* Right: Max Safety Delivery badge */}
