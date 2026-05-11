@@ -161,7 +161,7 @@ export default function Navbar() {
             style={{ textDecoration: "none", color: "inherit" }}
             onClick={() => setMobileOpen(false)}
           >
-            My Blog
+            ɌĐ
           </Link>
         </Typography>
 
