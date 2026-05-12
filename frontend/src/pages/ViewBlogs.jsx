@@ -203,7 +203,10 @@ function ViewBlogs() {
             alt={viewblog.title}
           />
 
-          <Typography variant="body2" sx={{ color: "red", mb: 1 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "gray",  ml: 1, fontStyle: "italic" }}
+          >
             Owned by {viewblog?.ownerName}
           </Typography>
 
