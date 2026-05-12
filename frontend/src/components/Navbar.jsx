@@ -65,6 +65,7 @@ export default function Navbar() {
   const handleSearch = () => {
     setMobileOpen(false); // 🔥 CLOSE DRAWER FIRST
     if (!isLoggedIn) {
+      toast.dismiss();
       toast.error("Please login first 🔐", {
         style: {
           borderRadius: "10px",
@@ -98,6 +99,7 @@ export default function Navbar() {
   // 🔥 CREATE BLOG PROTECTION
   const handleCreateBlog = () => {
     if (!isLoggedIn) {
+      toast.dismiss();
       toast.error("Please login first 🔐", {
         style: {
           borderRadius: "10px",

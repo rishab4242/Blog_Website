@@ -1,7 +1,14 @@
 import { useDropzone } from "react-dropzone";
 import { Box, Typography, Button } from "@mui/material";
 
-const ImageUpload = ({ file, setFile, preview, setPreview, error,setErrors, }) => {
+const ImageUpload = ({
+  file,
+  setFile,
+  preview,
+  setPreview,
+  error,
+  setErrors,
+}) => {
   const onDrop = (acceptedFiles) => {
     const selectedFile = acceptedFiles[0];
 
@@ -9,6 +16,10 @@ const ImageUpload = ({ file, setFile, preview, setPreview, error,setErrors, }) =
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
     }
+    setErrors((prev) => ({
+      ...prev,
+      image: "",
+    }));
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

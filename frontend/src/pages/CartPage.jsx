@@ -239,7 +239,12 @@ const CartPage = ({ cartItems, setCartItems }) => {
         item.id === id ? { ...item, qty: (item.qty || 1) + 1 } : item,
       ),
     );
-    toast.success("Quantity increased ➕");
+
+    toast.dismiss(); // remove old toast
+
+    toast.success("Quantity increased ➕", {
+      style: { borderRadius: "10px", background: "#333", color: "#fff" },
+    });
   };
 
   const handleDecrease = (id) => {
@@ -250,7 +255,12 @@ const CartPage = ({ cartItems, setCartItems }) => {
           : item,
       ),
     );
-    toast.success("Quantity decreased ➖");
+
+    toast.dismiss(); // remove old toast
+
+    toast.success("Quantity decreased ➖", {
+      style: { borderRadius: "10px", background: "#333", color: "#fff" },
+    });
   };
 
   const handleEmptyCart = () => {
