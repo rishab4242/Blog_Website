@@ -203,6 +203,10 @@ function ViewBlogs() {
             alt={viewblog.title}
           />
 
+          <Typography variant="body2" sx={{ color: "red", mb: 1 }}>
+            Owned by {viewblog?.ownerName}
+          </Typography>
+
           {/* Content */}
           <CardContent>
             <Typography gutterBottom variant="h5">

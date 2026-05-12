@@ -16,7 +16,14 @@ export const getBlogByIdView = (req, res) => {
   const currentUserId = req.user.id;
   const { id } = req.params;
 
-  const q = `SELECT * FROM blogs WHERE id = ?`;
+
+  const q = `
+  SELECT blogs.*, users.username AS ownerName
+  FROM blogs
+  INNER JOIN users
+  ON blogs.user_id = users.id
+  WHERE blogs.id = ?
+`;
 
   connection.query(q, [id], (err, result) => {
     if (err) return res.status(500).json(err);
@@ -26,6 +33,7 @@ export const getBlogByIdView = (req, res) => {
     }
 
     const blog = result[0];
+
     blog.isOwner = blog.user_id === currentUserId;
 
     res.json(blog);
