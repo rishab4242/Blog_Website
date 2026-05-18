@@ -11,18 +11,14 @@ export const signup = async (req, res) => {
 
     const q = `
       INSERT INTO users (username, email, password)
-      VALUES (?,?,?)
+      VALUES ($1,$2,$3)
     `;
 
-    connection.query(q, [username, email, hashedPassword], (err) => {
-      if (err) {
-        return res.status(500).json({ message: "Database Error" });
-      }
+    await connection.query(q, [username, email, hashedPassword]);
 
-      res.status(200).json({ message: "Signup Successfully!" });
-    });
+    res.status(200).json({ message: "Signup Successfully!" });
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Database Error" });
   }
 };
 
@@ -30,42 +26,40 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const q = `SELECT * FROM users WHERE email = ?`;
+  const q = `SELECT * FROM users WHERE email = $1`;
 
-  connection.query(q, [email], async (err, result) => {
-    if (err) {
-      return res.status(500).json({ message: "Database error" });
-    }
+  try {
+    const result = await connection.query(q, [email]);
 
-    if (result.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const user = result[0];
+    const user = result.rows[0];
 
-    try {
-      const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
-      if (!isMatch) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      const token = jwt.sign(
-        {
-          role: "user",
-          id: user.id,
-          email: user.email,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" },
-      );
-
-      res.status(200).json({
-        message: "Login successful",
-        token,
+    if (!isMatch) {
+      return res.status(401).json({
+        message: "Invalid credentials",
       });
-    } catch (error) {
-      res.status(500).json({ message: "Auth error" });
     }
-  });
+
+    const token = jwt.sign(
+      {
+        role: "user",
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" },
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Auth error" });
+  }
 };
