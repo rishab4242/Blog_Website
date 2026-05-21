@@ -6,7 +6,7 @@ export const getAllBlogs = async (req, res) => {
   const q = `SELECT * FROM blogs`;
 
   try {
-    const result = await connection.query(q);
+    const result = await pool.query(q);
     res.json(result.rows);
   } catch (err) {
     return res.status(500).json(err);
