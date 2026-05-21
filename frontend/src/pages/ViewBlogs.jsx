@@ -207,7 +207,7 @@ function ViewBlogs() {
             variant="body2"
             sx={{ color: "gray",  ml: 1, fontStyle: "italic" }}
           >
-            Owned by {viewblog?.ownerName}
+            Owned by {viewblog?.ownername}
           </Typography>
 
           {/* Content */}
