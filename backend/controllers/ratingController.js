@@ -1,4 +1,4 @@
-import { pool  } from "../config/db.js";
+import { pool } from "../config/db.js";
 
 // -------------------- ADD RATING --------------------
 export const addRating = async (req, res) => {
@@ -12,7 +12,7 @@ export const addRating = async (req, res) => {
   `;
 
   try {
-    await connection.query(insertQuery, [user_id, id, rating, description]);
+    await pool.query(insertQuery, [user_id, id, rating, description]);
 
     // Update average rating properly
     const avgQuery = `
@@ -25,7 +25,7 @@ export const addRating = async (req, res) => {
       WHERE id = $2
     `;
 
-    await connection.query(avgQuery, [id, id]);
+    await pool.query(avgQuery, [id, id]);
 
     res.json({ message: "Rating added successfully" });
   } catch (err) {
@@ -50,7 +50,7 @@ export const getRatingsByBlog = async (req, res) => {
   `;
 
   try {
-    const result = await connection.query(q, [currentUserId, blogId]);
+    const result = await pool.query(q, [currentUserId, blogId]);
 
     res.json(result.rows);
   } catch (err) {
@@ -70,10 +70,7 @@ export const deleteRating = async (req, res) => {
   `;
 
   try {
-    const data = await connection.query(getBlogQuery, [
-      ratingId,
-      currentUserId,
-    ]);
+    const data = await pool.query(getBlogQuery, [ratingId, currentUserId]);
 
     if (!data.rows.length) {
       return res.status(404).json({ message: "Rating not found" });
@@ -87,7 +84,7 @@ export const deleteRating = async (req, res) => {
       WHERE id = $1 AND user_id = $2
     `;
 
-    await connection.query(deleteQuery, [ratingId, currentUserId]);
+    await pool.query(deleteQuery, [ratingId, currentUserId]);
 
     // Step 3: recalculate average
     const updateAvg = `
@@ -100,7 +97,7 @@ export const deleteRating = async (req, res) => {
       WHERE id = $2
     `;
 
-    await connection.query(updateAvg, [blogId, blogId]);
+    await pool.query(updateAvg, [blogId, blogId]);
 
     res.json({ message: "Rating Deleted" });
   } catch (err) {

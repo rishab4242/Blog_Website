@@ -14,7 +14,7 @@ export const signup = async (req, res) => {
       VALUES ($1,$2,$3)
     `;
 
-    await connection.query(q, [username, email, hashedPassword]);
+    await pool.query(q, [username, email, hashedPassword]);
 
     res.status(200).json({ message: "Signup Successfully!" });
   } catch (error) {
@@ -29,7 +29,7 @@ export const login = async (req, res) => {
   const q = `SELECT * FROM users WHERE email = $1`;
 
   try {
-    const result = await connection.query(q, [email]);
+    const result = await pool.query(q, [email]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "User not found" });

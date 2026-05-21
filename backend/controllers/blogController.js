@@ -27,7 +27,7 @@ export const getBlogByIdView = async (req, res) => {
   `;
 
   try {
-    const result = await connection.query(q, [id]);
+    const result = await pool.query(q, [id]);
 
     if (result.rows.length === 0) {
       return res.status(404).send("Blog not found");
@@ -50,7 +50,7 @@ export const searchBlog = async (req, res) => {
   const q = `SELECT * FROM blogs WHERE title ILIKE $1 LIMIT 1`;
 
   try {
-    const result = await connection.query(q, [`%${title}%`]);
+    const result = await pool.query(q, [`%${title}%`]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "No Data Found" });
@@ -79,7 +79,7 @@ export const createBlog = async (req, res) => {
   `;
 
   try {
-    await connection.query(q, [
+    await pool.query(q, [
       title,
       image,
       price,
@@ -101,7 +101,7 @@ export const getBlogById = async (req, res) => {
   const q = `SELECT * FROM blogs WHERE id = $1`;
 
   try {
-    const result = await connection.query(q, [id]);
+    const result = await pool.query(q, [id]);
     res.json(result.rows);
   } catch (err) {
     return res.status(500).json(err);
@@ -117,7 +117,7 @@ export const updateBlog = async (req, res) => {
   const q = `SELECT * FROM blogs WHERE id=$1`;
 
   try {
-    const result = await connection.query(q, [id]);
+    const result = await pool.query(q, [id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Blog not found" });
@@ -150,7 +150,7 @@ export const updateBlog = async (req, res) => {
       values = [title, price, content, description, id];
     }
 
-    await connection.query(q1, values);
+    await pool.query(q1, values);
 
     res.json({ message: "Blog Updated Successfully" });
   } catch (err) {
@@ -164,7 +164,7 @@ export const deleteBlog = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await connection.query("SELECT * FROM blogs WHERE id=$1", [
+    const result = await pool.query("SELECT * FROM blogs WHERE id=$1", [
       id,
     ]);
 
@@ -182,7 +182,7 @@ export const deleteBlog = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    await connection.query("DELETE FROM blogs WHERE id=$1", [id]);
+    await pool.query("DELETE FROM blogs WHERE id=$1", [id]);
 
     res.json({ message: "Deleted successfully" });
   } catch (err) {
