@@ -1,4 +1,4 @@
-import { connection } from "../config/db.js";
+import { pool  } from "../config/db.js";
 
 // -------------------- ADD RATING --------------------
 export const addRating = async (req, res) => {
