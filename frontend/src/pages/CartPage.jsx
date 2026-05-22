@@ -308,6 +308,8 @@ const CartPage = ({ cartItems, setCartItems }) => {
       0,
     );
 
+    const token = localStorage.getItem("token");
+
     const res = await fetch(`${import.meta.env.VITE_API_URL}/order`, {
       method: "POST",
       body: JSON.stringify({
@@ -316,6 +318,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
         receipt: receiptId,
       }),
       headers: { "Content-Type": "application/json" },
+      Authorization: `Bearer ${token}`,
     });
 
     const order = await res.json();
@@ -330,16 +333,29 @@ const CartPage = ({ cartItems, setCartItems }) => {
       order_id: order.id,
 
       handler: async function (response) {
-        const body = { ...response };
         const validateRes = await fetch(
           `${import.meta.env.VITE_API_URL}/order/validate`,
           {
             method: "POST",
-            body: JSON.stringify(body),
-            headers: { "Content-Type": "application/json" },
+
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+
+              razorpay_payment_id: response.razorpay_payment_id,
+
+              razorpay_signature: response.razorpay_signature,
+            }),
           },
         );
-        await validateRes.json();
+
+        const data = await validateRes.json();
+
+        // console.log(data);
       },
 
       prefill: {
