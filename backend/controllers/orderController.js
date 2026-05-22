@@ -8,7 +8,19 @@ export const createOrder = async (req, res) => {
       key_secret: process.env.RAZORPAY_SECRET,
     });
 
-    const options = req.body;
+    const { amount, currency, receipt } = req.body;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        message: "Invalid amount",
+      });
+    }
+
+    const options = {
+      amount,
+      currency,
+      receipt,
+    };
 
     // STEP 1: CREATE ORDER IN RAZORPAY
     const order = await razorpay.orders.create(options);

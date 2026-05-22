@@ -309,31 +309,30 @@ const CartPage = ({ cartItems, setCartItems }) => {
     );
 
     const token = localStorage.getItem("token");
-    console.log("TOTAL AMOUNT =", totalAmount);
-    console.log("SENDING =", totalAmount * 100);
 
     const res = await fetch(`${import.meta.env.VITE_API_URL}/order`, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ✅ FIXED
+      },
       body: JSON.stringify({
         amount: totalAmount * 100,
         currency,
         receipt: receiptId,
       }),
-      headers: { "Content-Type": "application/json",
-        Authorization: token,
-       },
-      
     });
 
-    const order = await res.json();
+    const data = await res.json();
+
+    console.log("ORDER RESPONSE:", data);
+
+    const order = data.order;
 
     var options = {
       key: "rzp_test_SccIO2qO4Jepzu",
       amount: order.amount,
       currency,
-      name: "Acme Corp",
-      description: "Test Transaction",
-      image: "https://example.com/your_logo",
       order_id: order.id,
 
       handler: async function (response) {
@@ -341,25 +340,20 @@ const CartPage = ({ cartItems, setCartItems }) => {
           `${import.meta.env.VITE_API_URL}/order/validate`,
           {
             method: "POST",
-
             headers: {
               "Content-Type": "application/json",
-              Authorization: token,
+              Authorization: `Bearer ${token}`, // ✅ FIXED
             },
-
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id,
-
               razorpay_payment_id: response.razorpay_payment_id,
-
               razorpay_signature: response.razorpay_signature,
             }),
           },
         );
 
-        const data = await validateRes.json();
-
-        // console.log(data);
+        const result = await validateRes.json();
+        console.log(result);
       },
 
       prefill: {
