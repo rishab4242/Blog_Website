@@ -309,6 +309,8 @@ const CartPage = ({ cartItems, setCartItems }) => {
     );
 
     const token = localStorage.getItem("token");
+    console.log("TOTAL AMOUNT =", totalAmount);
+    console.log("SENDING =", totalAmount * 100);
 
     const res = await fetch(`${import.meta.env.VITE_API_URL}/order`, {
       method: "POST",
