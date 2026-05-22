@@ -319,8 +319,10 @@ const CartPage = ({ cartItems, setCartItems }) => {
         currency,
         receipt: receiptId,
       }),
-      headers: { "Content-Type": "application/json" },
-      Authorization: token,
+      headers: { "Content-Type": "application/json",
+        Authorization: token,
+       },
+      
     });
 
     const order = await res.json();
