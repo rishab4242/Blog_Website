@@ -314,7 +314,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: token, // ✅ FIXED
+        Authorization: `Bearer ${token}`, // ✅ FIXED
       },
       body: JSON.stringify({
         amount: totalAmount * 100,
@@ -342,7 +342,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: token, // ✅ FIXED
+              Authorization: `Bearer ${token}`, // ✅ FIXED
             },
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id,
