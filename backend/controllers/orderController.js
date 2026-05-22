@@ -8,12 +8,7 @@ export const createOrder = async (req, res) => {
       key_secret: process.env.RAZORPAY_SECRET,
     });
 
-    const options = {
-      amount: req.body.amount,
-      currency: "INR",
-      receipt: `receipt_${Date.now()}`,
-    };
-    console.log(req.body);
+    const options = req.body;
 
     // STEP 1: CREATE ORDER IN RAZORPAY
     const order = await razorpay.orders.create(options);
