@@ -320,7 +320,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
         receipt: receiptId,
       }),
       headers: { "Content-Type": "application/json" },
-      Authorization: `Bearer ${token}`,
+      Authorization: token,
     });
 
     const order = await res.json();
@@ -342,7 +342,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
 
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: token,
             },
 
             body: JSON.stringify({
