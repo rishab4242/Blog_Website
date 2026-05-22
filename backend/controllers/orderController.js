@@ -9,7 +9,6 @@ export const createOrder = async (req, res) => {
     });
 
     const { amount, currency, receipt } = req.body;
-    
 
     if (!amount || amount <= 0) {
       return res.status(400).json({
@@ -188,7 +187,12 @@ export const validatePayment = async (req, res) => {
       paymentStatus,
     ];
 
-    const paymentResult = await pool.query(paymentQuery, paymentValues);
+    try {
+      const paymentResult = await pool.query(paymentQuery, paymentValues);
+      console.log("INSERT SUCCESS:", paymentResult.rows[0]);
+    } catch (err) {
+      console.log("DB INSERT ERROR:", err);
+    }
 
     // ==============================
     // UPDATE ORDER STATUS
