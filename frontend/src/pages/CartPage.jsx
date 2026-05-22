@@ -304,7 +304,7 @@ const CartPage = ({ cartItems, setCartItems }) => {
 
   const payementHandler = async (e) => {
     const totalAmount = cartItems.reduce(
-      (acc, item) => acc + Number(item.price) * (item.qty || 1),
+      (acc, item) => acc + item.price * (item.qty || 1),
       0,
     );
 
