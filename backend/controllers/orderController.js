@@ -9,8 +9,7 @@ export const createOrder = async (req, res) => {
     });
 
     const { amount, currency, receipt } = req.body;
-
-    const amountInPaise = Number(amount) * 100;
+    
 
     if (!amount || amount <= 0) {
       return res.status(400).json({
@@ -19,7 +18,7 @@ export const createOrder = async (req, res) => {
     }
 
     const options = {
-      amount: amountInPaise,
+      amount,
       currency,
       receipt,
     };
