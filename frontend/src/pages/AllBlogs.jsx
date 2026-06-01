@@ -45,7 +45,7 @@ function AllBlogs({ setCartItems }) {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/blogs/`, {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         });
 

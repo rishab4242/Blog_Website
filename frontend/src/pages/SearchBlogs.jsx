@@ -10,12 +10,9 @@ import BlogCard from "../components/BlogCard";
 import toast from "react-hot-toast";
 import NoBlogsFound from "../components/NoBlogsFound";
 
-
 function SearchBlogs({ setCartItems }) {
   const { query } = useParams();
   const [blogs, setBlogs] = useState([]);
-
-  
 
   useEffect(() => {
     const fetchSearch = async () => {
@@ -25,7 +22,7 @@ function SearchBlogs({ setCartItems }) {
           `${import.meta.env.VITE_API_URL}/blogs/search?title=${query}`,
           {
             headers: {
-              Authorization: token,
+              Authorization: `Bearer ${token}`,
             },
           },
         );

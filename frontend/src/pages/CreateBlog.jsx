@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import ImageUpload from "../components/ImageUpload";
 
-
 function CreateBlog() {
   const [blogs, setBlogs] = useState({
     title: "",
@@ -137,7 +136,7 @@ function CreateBlog() {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         },
       );

@@ -3,7 +3,6 @@ import { Box, Rating, Typography, TextField, Button } from "@mui/material";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-
 function Ratings({ blogId, refreshRatings }) {
   const [value, setValue] = React.useState(0);
   const [desc, setDesc] = React.useState("");
@@ -35,7 +34,7 @@ function Ratings({ blogId, refreshRatings }) {
         },
         {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         },
       );

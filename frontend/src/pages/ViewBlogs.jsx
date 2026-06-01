@@ -63,7 +63,7 @@ function ViewBlogs() {
         `${import.meta.env.VITE_API_URL}/blogs/${id}/rating`,
         {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         },
       );
@@ -82,7 +82,7 @@ function ViewBlogs() {
           `${import.meta.env.VITE_API_URL}/blogs/${id}/rating`,
           {
             headers: {
-              Authorization: token,
+              Authorization: `Bearer ${token}`,
             },
           },
         );
@@ -163,7 +163,7 @@ function ViewBlogs() {
         `${import.meta.env.VITE_API_URL}/blogs/${ratingId}/rating/delete`,
         {
           headers: {
-            Authorization: token,
+            Authorization: `Bearer ${token}`,
           },
         },
       );
@@ -205,7 +205,7 @@ function ViewBlogs() {
 
           <Typography
             variant="body2"
-            sx={{ color: "gray",  ml: 1, fontStyle: "italic" }}
+            sx={{ color: "gray", ml: 1, fontStyle: "italic" }}
           >
             Owned by {viewblog?.ownername}
           </Typography>
