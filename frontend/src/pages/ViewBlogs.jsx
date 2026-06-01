@@ -34,7 +34,7 @@ function ViewBlogs() {
         let res = await axios.get(
           `${import.meta.env.VITE_API_URL}/blogs/${id}/view`,
           {
-            headers: { Authorization: token },
+            headers: { Authorization: `Bearer ${token}` },
           },
         );
 
