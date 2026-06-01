@@ -1,6 +1,8 @@
-import { pool  } from "../config/db.js";
+import { pool } from "../config/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 // -------------------- SIGNUP --------------------
 export const signup = async (req, res) => {
@@ -60,6 +62,11 @@ export const login = async (req, res) => {
       token,
     });
   } catch (error) {
-    res.status(500).json({ message: "Auth error" });
+    console.error("Login Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
