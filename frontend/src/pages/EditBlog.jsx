@@ -75,7 +75,7 @@ function EditBlog() {
         const res = await axios.get(
           `${import.meta.env.VITE_API_URL}/blogs/${id}`,
           {
-            headers: { Authorization: token },
+            headers: { Authorization: `Bearer ${token}` },
           },
         );
 

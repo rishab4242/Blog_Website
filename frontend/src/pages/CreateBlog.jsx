@@ -222,7 +222,7 @@ function CreateBlog() {
               name="title"
               value={blogs.title}
               onChange={handleChange}
-              error={!!errors.title}
+              error={!!errors.title}edit
               helperText={errors.title}
               fullWidth
             />
