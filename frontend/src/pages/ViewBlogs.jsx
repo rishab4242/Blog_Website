@@ -123,7 +123,9 @@ function ViewBlogs() {
       let res = await axios.delete(
         `${import.meta.env.VITE_API_URL}/blogs/${id}/delete`,
         {
-          Authorization: `Bearer ${token}`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
 
